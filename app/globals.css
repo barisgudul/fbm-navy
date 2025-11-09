@@ -1,0 +1,24 @@
+/* app/globals.css */
+@import "tailwindcss";
+
+html, body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(205, 170, 102, 0.22), transparent 46%),
+    radial-gradient(circle at 78% 22%, rgba(142, 165, 196, 0.16), transparent 54%),
+    radial-gradient(circle at 36% 82%, rgba(183, 138, 81, 0.16), transparent 52%),
+    linear-gradient(135deg, #1a2534 0%, #233144 28%, #2f3f55 55%, #425369 78%, #233041 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* Scrollbar'ı tamamen gizle */
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
