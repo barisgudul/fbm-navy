@@ -1,7 +1,7 @@
 /* app/satilik/[id]/page.tsx */
 import { Metadata } from 'next';
 import { supabase } from '@/app/lib/supabaseClient';
-import PropertyDetailClient from './PropertyDetailClient';
+import PropertyDetailClient from '@/app/components/PropertyDetailClient';
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const { data } = await supabase
@@ -40,11 +40,11 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 }
 
 export default async function SatilikDetailPage({ params }: { params: { id: string } }) {
-  const { data, error } = await supabase
-    .from('properties')
-    .select('*')
-    .eq('id', params.id)
-    .single();
+      const { data, error } = await supabase
+        .from('properties')
+        .select('*')
+        .eq('id', params.id)
+        .single();
 
   if (error || !data) {
     return (
@@ -54,19 +54,19 @@ export default async function SatilikDetailPage({ params }: { params: { id: stri
     );
   }
 
-  const imagesList = (data.image_urls && data.image_urls.length > 0) 
-    ? data.image_urls 
-    : ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop'];
+        const imagesList = (data.image_urls && data.image_urls.length > 0) 
+          ? data.image_urls 
+          : ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop'];
 
   const property = {
-    id: data.id,
-    title: data.title,
-    location: data.location,
-    price: data.price,
-    area: data.area,
-    rooms: data.rooms,
-    livingRoom: data.living_rooms,
-    bathrooms: data.bathrooms,
+          id: data.id,
+          title: data.title,
+          location: data.location,
+          price: data.price,
+          area: data.area,
+          rooms: data.rooms,
+          livingRoom: data.living_rooms,
+          bathrooms: data.bathrooms,
     description: data.description || '',
     images: imagesList,
     type: data.type

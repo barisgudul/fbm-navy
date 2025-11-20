@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const bodoni = Bodoni_Moda({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-bodoni" });
 
 export const metadata: Metadata = {
-  title: "FBM Emlak & Mimarlık",
+  title: "FBM Emlak & Tasarım",
   description: "Lüks konut ve tasarım çözümleri.",
 };
 

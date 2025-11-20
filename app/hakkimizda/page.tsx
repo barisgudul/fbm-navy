@@ -31,7 +31,7 @@ export default function HakkimizdaPage() {
             Hakkımızda
           </h1>
           <p className="font-sans text-lg md:text-xl text-white/80 text-center max-w-3xl mx-auto leading-relaxed">
-            FBM Emlak & Mimarlık, gayrimenkul ve mekan tasarımı alanında uzman ekibimizle, 
+            FBM Emlak & Tasarım, gayrimenkul ve mekan tasarımı alanında uzman ekibimizle, 
             hayallerinizi gerçeğe dönüştürmek için buradayız.
           </p>
         </motion.div>
@@ -44,11 +44,11 @@ export default function HakkimizdaPage() {
           className="bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-8 md:p-12 border border-fbm-sage-200/30 mb-12"
         >
           <h2 className="font-serif text-3xl md:text-4xl text-fbm-gold-400 mb-6">
-            FBM Emlak & Mimarlık
+            FBM Emlak & Tasarım
           </h2>
           <div className="space-y-4 text-white/80 leading-relaxed">
             <p>
-              FBM Emlak & Mimarlık olarak, Isparta ve çevresinde gayrimenkul sektöründe 
+              FBM Emlak & Tasarım olarak, Isparta ve çevresinde gayrimenkul sektöründe 
               güvenilir hizmet sunmayı hedefliyoruz. Satılık ve kiralık konut seçeneklerinden 
               profesyonel mekan tasarımı hizmetlerine kadar geniş bir yelpazede müşterilerimizin 
               ihtiyaçlarını karşılıyoruz.

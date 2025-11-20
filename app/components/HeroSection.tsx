@@ -15,7 +15,7 @@ const narratives = [
   },
   {
     line1: "MEKANLARA SANAT KATAN",
-    highlight: "MİMARİ USTALIK.",
+    highlight: "TASARIM USTALIĞI.",
     paragraph: "Her detayı özenle tasarlanan projelerimizle, estetik ve fonksiyonu kusursuz bir dengeyle birleştiriyoruz."
   },
   {

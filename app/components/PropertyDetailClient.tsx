@@ -1,11 +1,10 @@
-/* app/satilik/[id]/PropertyDetailClient.tsx */
+/* app/components/PropertyDetailClient.tsx */
 'use client';
 
 import { useEffect, useState, FormEvent } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/app/lib/supabaseClient';
 import Image from 'next/image';
-import Link from 'next/link';
 import { Bed, Bath, Square, ArrowLeft, MapPin, X, ChevronLeft, ChevronRight, Maximize2, Send, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PropertyCard } from '@/app/components/PropertyCard';
@@ -36,6 +35,20 @@ interface RelatedProperty {
   image: string;
 }
 
+interface DBProperty {
+  id: number;
+  title: string;
+  location: string;
+  price: string;
+  area: number;
+  rooms: number;
+  living_rooms: number;
+  bathrooms: number;
+  image_urls: string[] | null;
+  type: string;
+  status: string;
+}
+
 export default function PropertyDetailClient({ initialProperty }: { initialProperty: Property }) {
   const router = useRouter();
   const [property] = useState<Property | null>(initialProperty);
@@ -60,7 +73,7 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
         .limit(3);
 
       if (!error && data) {
-        const formatted = data.map((item: any) => ({
+        const formatted: RelatedProperty[] = data.map((item: DBProperty) => ({
           id: item.id,
           title: item.title,
           location: item.location,

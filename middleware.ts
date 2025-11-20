@@ -2,16 +2,6 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  // Sadece /admin ile başlayan rotalarda çalış
-  if (!request.nextUrl.pathname.startsWith('/admin')) {
-    return NextResponse.next()
-  }
-
-  // Login sayfası hariç tut
-  if (request.nextUrl.pathname === '/admin/login') {
-    return NextResponse.next()
-  }
-
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -27,7 +17,7 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           response = NextResponse.next({
             request: {
               headers: request.headers,
@@ -41,16 +31,30 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Session kontrolü
+  // Kullanıcıyı doğrula
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  // Oturum yoksa login sayfasına yönlendir
-  if (!session) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/admin/login'
-    return NextResponse.redirect(url)
+  const path = request.nextUrl.pathname
+
+  // Admin rotaları kontrolü
+  if (path.startsWith('/admin')) {
+    // Login sayfası kontrolü
+    if (path === '/admin/login') {
+      // Eğer kullanıcı zaten giriş yapmışsa ve login sayfasına gitmeye çalışıyorsa panele yönlendir
+      if (user) {
+        return NextResponse.redirect(new URL('/admin/panel', request.url))
+      }
+      // Giriş yapmamışsa login sayfasını göster
+      return response
+    }
+
+    // Diğer tüm admin sayfaları için (panel, yeni-proje vb.)
+    // Eğer kullanıcı yoksa login sayfasına at
+    if (!user) {
+      return NextResponse.redirect(new URL('/admin/login', request.url))
+    }
   }
 
   return response
@@ -58,6 +62,13 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/admin/:path*', // Sadece admin rotalarını dinle
+    /*
+     * Tüm request yollarını eşleştir ama şunları hariç tut:
+     * - _next/static (static dosyalar)
+     * - _next/image (resim optimizasyon dosyaları)
+     * - favicon.ico (favicon dosyası)
+     * - public klasöründeki resimler (svg, png, jpg, jpeg, gif, webp)
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

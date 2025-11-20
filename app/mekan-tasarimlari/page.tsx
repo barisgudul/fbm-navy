@@ -77,11 +77,11 @@ export default function MekanTasarimlariPage() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {designs.map((design, index) => (
-                <DesignCard key={design.id} design={design} index={index} />
-              ))}
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {designs.map((design, index) => (
+            <DesignCard key={design.id} design={design} index={index} />
+          ))}
+        </div>
             
             {designs.length === 0 && (
               <div className="text-white/60 text-center py-20 bg-fbm-denim-750/30 rounded-lg border border-white/5 mt-8">

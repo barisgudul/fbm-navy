@@ -2,11 +2,12 @@
 'use client';
 
 import { useState, useEffect, ChangeEvent } from 'react';
-import { supabase } from '@/app/lib/supabaseClient';
+import { createClient } from '@/app/lib/supabaseBrowser';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 export default function YeniIlanPage() {
+  const supabase = createClient();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -23,7 +24,7 @@ export default function YeniIlanPage() {
       }
     }
     checkAuth();
-  }, [router]);
+  }, [router, supabase]);
   
   // Dosya seçilince çalışacak fonksiyon (GÜNCELLENDİ: Üzerine Ekleme Yapar)
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {

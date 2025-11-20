@@ -3,11 +3,12 @@
 
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { supabase } from '@/app/lib/supabaseClient';
+import { createClient } from '@/app/lib/supabaseBrowser';
 import Image from 'next/image';
 import { ArrowLeft, X, Plus } from 'lucide-react';
 
 export default function EditPropertyPage() {
+  const supabase = createClient();
   const params = useParams();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -68,7 +69,7 @@ export default function EditPropertyPage() {
     };
 
     checkAuthAndFetch();
-  }, [params.id, router]);
+  }, [params.id, router, supabase]);
 
   // Input Değişikliği
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

@@ -18,7 +18,7 @@ export function ClientWrapper({ children }: { children: React.ReactNode }) {
     const showPreloader = setTimeout(() => setIsLoading(true), 0);
     
     // Süreyi animasyonla senkronize et (1s anim + 0.5s bekleme + 0.5s çıkış)
-    const hidePreloader = setTimeout(() => setIsLoading(false), 2500);
+    const hidePreloader = setTimeout(() => setIsLoading(false), 2300);
     
     return () => {
       clearTimeout(showPreloader);

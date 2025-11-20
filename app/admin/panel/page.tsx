@@ -1,8 +1,8 @@
 /* app/admin/panel/page.tsx */
 'use client';
 
-import { useState, useEffect } from 'react';
-import { supabase } from '@/app/lib/supabaseClient';
+import { useState, useEffect, useCallback } from 'react';
+import { createClient } from '@/app/lib/supabaseBrowser';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -33,13 +33,14 @@ interface Design {
 type TabType = 'properties' | 'designs';
 
 export default function AdminPanelPage() {
+  const [supabase] = useState(() => createClient());
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>('properties');
   const [properties, setProperties] = useState<Property[]>([]);
   const [designs, setDesigns] = useState<Design[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchProperties = async () => {
+  const fetchProperties = useCallback(async () => {
     const { data, error } = await supabase
       .from('properties')
       .select('*')
@@ -47,9 +48,9 @@ export default function AdminPanelPage() {
 
     if (error) console.error('Hata:', error);
     else setProperties(data || []);
-  };
+  }, [supabase]);
 
-  const fetchDesigns = async () => {
+  const fetchDesigns = useCallback(async () => {
     const { data, error } = await supabase
       .from('designs')
       .select('*')
@@ -57,7 +58,7 @@ export default function AdminPanelPage() {
 
     if (error) console.error('Hata:', error);
     else setDesigns(data || []);
-  };
+  }, [supabase]);
 
   // Oturum Kontrolü ve Veri Çekme
   useEffect(() => {
@@ -71,20 +72,22 @@ export default function AdminPanelPage() {
       setLoading(false);
     };
     checkAuthAndFetch();
-  }, [router]);
+  }, [router, supabase, fetchProperties, fetchDesigns]);
 
   // Tab değiştiğinde veriyi yenile
   useEffect(() => {
     if (loading) return;
     
-    // Tab değiştiğinde ilgili veriyi yenile
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    if (activeTab === 'properties') {
-      fetchProperties();
-    } else {
-      fetchDesigns();
-    }
-  }, [activeTab]);
+    const loadData = async () => {
+      if (activeTab === 'properties') {
+        await fetchProperties();
+      } else {
+        await fetchDesigns();
+      }
+    };
+
+    loadData();
+  }, [activeTab, loading, fetchProperties, fetchDesigns]);
 
   // İlan Silme
   const handleDeleteProperty = async (id: number) => {
@@ -147,16 +150,16 @@ export default function AdminPanelPage() {
           <h1 className="text-3xl font-serif text-fbm-gold-400">Yönetim Paneli</h1>
           <div className="flex gap-4">
             {activeTab === 'properties' ? (
-              <Link 
-                href="/admin/yeni-ilan" 
-                className="flex items-center gap-2 bg-fbm-gold-400 text-fbm-navy-900 px-4 py-2 rounded font-bold hover:bg-white transition-colors"
-              >
-                <Plus size={18} /> Yeni İlan Ekle
-              </Link>
+            <Link 
+              href="/admin/yeni-ilan" 
+              className="flex items-center gap-2 bg-fbm-gold-400 text-fbm-navy-900 px-4 py-2 rounded font-bold hover:bg-fbm-bronze-400 hover:text-white transition-colors"
+            >
+              <Plus size={18} /> Yeni İlan Ekle
+            </Link>
             ) : (
               <Link 
                 href="/admin/yeni-proje" 
-                className="flex items-center gap-2 bg-fbm-gold-400 text-fbm-navy-900 px-4 py-2 rounded font-bold hover:bg-white transition-colors"
+                className="flex items-center gap-2 bg-fbm-gold-400 text-fbm-navy-900 px-4 py-2 rounded font-bold hover:bg-fbm-bronze-400 hover:text-white transition-colors"
               >
                 <Plus size={18} /> Yeni Proje Ekle
               </Link>
@@ -196,73 +199,73 @@ export default function AdminPanelPage() {
 
         {/* İlan Listesi Tablosu */}
         {activeTab === 'properties' && (
-          <div className="bg-fbm-denim-750 rounded-xl border border-white/10 overflow-hidden overflow-x-auto shadow-xl">
-            <table className="w-full text-left text-sm text-white/80">
-              <thead className="bg-fbm-navy-900 text-fbm-gold-400 uppercase tracking-wider text-xs border-b border-white/10">
-                <tr>
-                  <th className="p-4">Görsel</th>
-                  <th className="p-4">Başlık</th>
-                  <th className="p-4">Fiyat</th>
-                  <th className="p-4">Tip</th>
-                  <th className="p-4 text-center">Durum</th>
-                  <th className="p-4 text-right">İşlemler</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {properties.map((property) => (
-                  <tr key={property.id} className="hover:bg-white/5 transition-colors">
-                    <td className="p-4">
-                      <div className="relative w-16 h-12 rounded overflow-hidden border border-white/10">
-                        <Image 
-                          src={property.image_urls?.[0] || '/fbm.png'} 
-                          alt={property.title} 
-                          fill 
-                          className="object-cover"
-                        />
-                      </div>
-                    </td>
-                    <td className="p-4 font-medium text-white">{property.title}</td>
-                    <td className="p-4">{property.price}</td>
-                    <td className="p-4 capitalize">{property.type}</td>
-                    <td className="p-4 text-center">
-                      <button 
-                        onClick={() => toggleStatus(property.id, property.status || 'aktif')}
-                        className={`px-3 py-1 rounded-full text-xs font-bold border ${
-                          property.status === 'aktif' 
-                            ? 'bg-green-500/20 text-green-400 border-green-500/30' 
-                            : 'bg-red-500/20 text-red-400 border-red-500/30'
-                        }`}
+        <div className="bg-fbm-denim-750 rounded-xl border border-white/10 overflow-hidden overflow-x-auto shadow-xl">
+          <table className="w-full text-left text-sm text-white/80">
+            <thead className="bg-fbm-navy-900 text-fbm-gold-400 uppercase tracking-wider text-xs border-b border-white/10">
+              <tr>
+                <th className="p-4">Görsel</th>
+                <th className="p-4">Başlık</th>
+                <th className="p-4">Fiyat</th>
+                <th className="p-4">Tip</th>
+                <th className="p-4 text-center">Durum</th>
+                <th className="p-4 text-right">İşlemler</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {properties.map((property) => (
+                <tr key={property.id} className="hover:bg-white/5 transition-colors">
+                  <td className="p-4">
+                    <div className="relative w-32 h-24 rounded overflow-hidden border border-white/10 bg-fbm-navy-900/50">
+                      <Image 
+                        src={property.image_urls?.[0] || '/logo.png'} 
+                        alt={property.title} 
+                        fill 
+                        className={property.image_urls?.[0] ? "object-cover" : "object-contain p-2"}
+                      />
+                    </div>
+                  </td>
+                  <td className="p-4 font-medium text-white">{property.title}</td>
+                  <td className="p-4">{property.price}</td>
+                  <td className="p-4 capitalize">{property.type}</td>
+                  <td className="p-4 text-center">
+                    <button 
+                      onClick={() => toggleStatus(property.id, property.status || 'aktif')}
+                      className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                        property.status === 'aktif' 
+                          ? 'bg-green-500/20 text-green-400 border-green-500/30' 
+                          : 'bg-red-500/20 text-red-400 border-red-500/30'
+                      }`}
+                    >
+                      {property.status === 'aktif' ? 'Yayında' : 'Satıldı/Pasif'}
+                    </button>
+                  </td>
+                  <td className="p-4 text-right">
+                    <div className="flex items-center justify-end gap-3">
+                      <Link 
+                        href={`/admin/duzenle/${property.id}`} 
+                        className="text-blue-400 hover:text-white transition-colors"
+                        title="Düzenle"
                       >
-                        {property.status === 'aktif' ? 'Yayında' : 'Satıldı/Pasif'}
-                      </button>
-                    </td>
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-3">
-                        <Link 
-                          href={`/admin/duzenle/${property.id}`} 
-                          className="text-blue-400 hover:text-white transition-colors"
-                          title="Düzenle"
-                        >
-                          <Edit size={18} />
-                        </Link>
-                        <button 
+                        <Edit size={18} />
+                      </Link>
+                      <button 
                           onClick={() => handleDeleteProperty(property.id)} 
-                          className="text-red-400 hover:text-red-200 transition-colors"
-                          title="Sil"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            
-            {properties.length === 0 && (
-              <div className="p-8 text-center text-white/50">Henüz hiç ilan eklenmemiş.</div>
-            )}
-          </div>
+                        className="text-red-400 hover:text-red-200 transition-colors"
+                        title="Sil"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          
+          {properties.length === 0 && (
+            <div className="p-8 text-center text-white/50">Henüz hiç ilan eklenmemiş.</div>
+          )}
+        </div>
         )}
 
         {/* Proje Listesi Tablosu */}
@@ -284,12 +287,12 @@ export default function AdminPanelPage() {
                 {designs.map((design) => (
                   <tr key={design.id} className="hover:bg-white/5 transition-colors">
                     <td className="p-4">
-                      <div className="relative w-16 h-12 rounded overflow-hidden border border-white/10">
+                    <div className="relative w-32 h-24 rounded overflow-hidden border border-white/10 bg-fbm-navy-900/50">
                         <Image 
-                          src={design.image_urls?.[0] || '/fbm.png'} 
+                          src={design.image_urls?.[0] || '/logo.png'} 
                           alt={design.title} 
                           fill 
-                          className="object-cover"
+                          className={design.image_urls?.[0] ? "object-cover" : "object-contain p-2"}
                         />
                       </div>
                     </td>
