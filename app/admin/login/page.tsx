@@ -23,7 +23,7 @@ export default function LoginPage() {
       alert('Giriş başarısız: ' + error.message);
       setLoading(false);
     } else {
-      router.push('/admin/yeni-ilan');
+      router.push('/admin/panel');
     }
   };
 

@@ -18,6 +18,7 @@ interface Property {
   livingRoom: number;
   bathrooms: number;
   image: string;
+  status?: string;
 }
 
 interface PropertyCardProps {
@@ -50,6 +51,13 @@ export function PropertyCard({ property, index }: PropertyCardProps) {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-fbm-navy-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            {(property.status === 'satildi' || property.status === 'kiralandi') && (
+              <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-20">
+                <span className="border-4 border-red-500 text-red-500 font-bold text-2xl md:text-4xl px-4 py-2 -rotate-12 uppercase tracking-widest">
+                  {property.status === 'satildi' ? 'SATILDI' : 'KİRALANDI'}
+                </span>
+              </div>
+            )}
           </>
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-fbm-navy-900 via-fbm-denim-750 to-fbm-gold-400 text-fbm-champagne-150/30">

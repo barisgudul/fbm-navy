@@ -52,9 +52,52 @@ export default function YeniIlanPage() {
   const removeImage = (indexToRemove: number) => {
     setSelectedFiles(prev => prev.filter((_, index) => index !== indexToRemove));
     setPreviews(prev => {
-      // Silinen URL'i bellekten temizle (Memory Leak önlemi)
       URL.revokeObjectURL(prev[indexToRemove]);
       return prev.filter((_, index) => index !== indexToRemove);
+    });
+  };
+
+  const moveImageLeft = (index: number) => {
+    if (index === 0) return;
+    setSelectedFiles(prev => {
+      const newFiles = [...prev];
+      [newFiles[index - 1], newFiles[index]] = [newFiles[index], newFiles[index - 1]];
+      return newFiles;
+    });
+    setPreviews(prev => {
+      const newPreviews = [...prev];
+      [newPreviews[index - 1], newPreviews[index]] = [newPreviews[index], newPreviews[index - 1]];
+      return newPreviews;
+    });
+  };
+
+  const moveImageRight = (index: number) => {
+    if (index === selectedFiles.length - 1) return;
+    setSelectedFiles(prev => {
+      const newFiles = [...prev];
+      [newFiles[index], newFiles[index + 1]] = [newFiles[index + 1], newFiles[index]];
+      return newFiles;
+    });
+    setPreviews(prev => {
+      const newPreviews = [...prev];
+      [newPreviews[index], newPreviews[index + 1]] = [newPreviews[index + 1], newPreviews[index]];
+      return newPreviews;
+    });
+  };
+
+  const setCoverImage = (index: number) => {
+    if (index === 0) return;
+    setSelectedFiles(prev => {
+      const newFiles = [...prev];
+      const [moved] = newFiles.splice(index, 1);
+      newFiles.unshift(moved);
+      return newFiles;
+    });
+    setPreviews(prev => {
+      const newPreviews = [...prev];
+      const [moved] = newPreviews.splice(index, 1);
+      newPreviews.unshift(moved);
+      return newPreviews;
     });
   };
 
@@ -179,27 +222,64 @@ export default function YeniIlanPage() {
               </div>
             </div>
 
-            {/* Seçilen Fotoğrafların Önizlemesi (GÜNCELLENDİ: Silme Butonlu) */}
+            {/* Seçilen Fotoğrafların Önizlemesi (Sıralama ve Kapak Yap Butonlu) */}
             {previews.length > 0 && (
-              <div className="grid grid-cols-4 sm:grid-cols-5 gap-3 animate-reveal-line mt-4">
-                {previews.map((url, index) => (
-                  <div key={index} className="relative aspect-square rounded-lg overflow-hidden border border-fbm-gold-400/30 group">
-                    <Image 
-                      src={url} 
-                      alt={`Önizleme ${index + 1}`} 
-                      fill 
-                      className="object-cover transition-transform duration-500 group-hover:scale-110" 
-                    />
-                    {/* Silme Butonu */}
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute top-1 right-1 bg-red-600/80 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs hover:bg-red-500 transition-colors z-10"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
+              <div className="space-y-4 mt-4">
+                <p className="text-xs text-fbm-gold-400/80">İlk fotoğraf kapak fotoğrafı olarak kullanılacaktır.</p>
+                <div className="grid grid-cols-4 sm:grid-cols-5 gap-3 animate-reveal-line">
+                  {previews.map((url, index) => (
+                    <div key={index} className={`relative aspect-square rounded-lg overflow-hidden border-2 group ${index === 0 ? 'border-fbm-gold-400 ring-2 ring-fbm-gold-400/50' : 'border-fbm-gold-400/30'}`}>
+                      <Image 
+                        src={url} 
+                        alt={`Önizleme ${index + 1}`} 
+                        fill 
+                        className="object-cover transition-transform duration-500 group-hover:scale-110" 
+                      />
+                      {index === 0 && (
+                        <div className="absolute top-1 left-1 bg-fbm-gold-400 text-fbm-navy-900 text-[10px] font-bold px-2 py-0.5 rounded">
+                          KAPAK
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => moveImageLeft(index)}
+                          disabled={index === 0}
+                          className="bg-fbm-navy-900/90 text-white p-1.5 rounded hover:bg-fbm-gold-400 hover:text-fbm-navy-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          title="Sola Taşı"
+                        >
+                          ←
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCoverImage(index)}
+                          disabled={index === 0}
+                          className="bg-fbm-gold-400 text-fbm-navy-900 p-1.5 rounded hover:bg-fbm-bronze-400 font-bold text-xs disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          title="Kapak Yap"
+                        >
+                          ⭐
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveImageRight(index)}
+                          disabled={index === previews.length - 1}
+                          className="bg-fbm-navy-900/90 text-white p-1.5 rounded hover:bg-fbm-gold-400 hover:text-fbm-navy-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          title="Sağa Taşı"
+                        >
+                          →
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="bg-red-600/90 text-white p-1.5 rounded hover:bg-red-500 transition-colors absolute top-1 right-1"
+                          title="Sil"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
             
