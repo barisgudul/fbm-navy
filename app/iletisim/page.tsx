@@ -4,7 +4,7 @@
 
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, MapPin, Phone, Mail } from 'lucide-react';
+import { ArrowLeft, MapPin, Phone, Mail, Instagram, MessageCircle } from 'lucide-react';
 
 export default function IletisimPage() {
   const router = useRouter();
@@ -36,7 +36,7 @@ export default function IletisimPage() {
         </motion.div>
 
         {/* İletişim Bilgileri */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {/* Adres */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -74,9 +74,12 @@ export default function IletisimPage() {
                 <h3 className="font-serif text-2xl md:text-3xl text-fbm-gold-400 mb-4">
                   Telefon
                 </h3>
-                <p className="text-white/80 leading-relaxed">
-                  Telefon numarası bilgisi eklenecek
-                </p>
+                <a 
+                  href="tel:+905435910932"
+                  className="text-white/80 hover:text-fbm-gold-400 transition-colors duration-300"
+                >
+                  +90 543 591 09 32
+                </a>
               </div>
             </div>
           </motion.div>
@@ -97,10 +100,10 @@ export default function IletisimPage() {
                   E-posta
                 </h3>
                 <a 
-                  href="mailto:destek@fbm.com"
+                  href="mailto:FBMgayrimenkul.32@gmail.com"
                   className="text-white/80 hover:text-fbm-gold-400 transition-colors duration-300"
                 >
-                  destek@fbm.com
+                  FBMgayrimenkul.32@gmail.com
                 </a>
               </div>
             </div>
@@ -108,9 +111,9 @@ export default function IletisimPage() {
 
           {/* Çalışma Saatleri */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
             className="bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-8 border border-fbm-sage-200/30"
           >
             <div className="flex items-start gap-4 mb-6">
@@ -122,12 +125,78 @@ export default function IletisimPage() {
                   Çalışma Saatleri
                 </h3>
                 <div className="space-y-2 text-white/80 leading-relaxed">
-                  <p>Pazartesi - Cuma: 09:00 - 18:00</p>
+                  <p>Hafta İçi: 09:00 - 18:00</p>
                   <p>Cumartesi: 09:00 - 14:00</p>
                   <p>Pazar: Kapalı</p>
                 </div>
               </div>
             </div>
+          </motion.div>
+
+          {/* Instagram */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+            className="bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-8 border border-fbm-sage-200/30 group hover:border-fbm-gold-400 transition-all duration-300 cursor-pointer"
+          >
+            <a 
+              href="https://www.instagram.com/fbm_gayrimenkul"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-start gap-4 mb-6"
+            >
+              <div className="bg-fbm-cream-100/20 p-3 rounded-lg group-hover:bg-fbm-gold-400/20 transition-all duration-300">
+                <Instagram className="w-6 h-6 text-fbm-gold-400" />
+              </div>
+              <div>
+                <h3 className="font-serif text-2xl md:text-3xl text-fbm-gold-400 mb-2">
+                  Instagram
+                </h3>
+                <p className="text-white/60 mb-4 text-sm leading-relaxed">
+                  En güncel portföyümüz ve projelerimiz için bizi Instagram&apos;da takip edin.
+                </p>
+                <span className="text-white/80 group-hover:text-fbm-gold-400 transition-colors duration-300 flex items-center gap-2 font-medium">
+                  @fbm_gayrimenkul
+                  <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </div>
+            </a>
+          </motion.div>
+
+          {/* WhatsApp */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            className="bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-8 border border-fbm-sage-200/30 group hover:border-fbm-gold-400 transition-all duration-300 cursor-pointer"
+          >
+            <a 
+              href="https://wa.me/905435910932"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-start gap-4 mb-6"
+            >
+              <div className="bg-fbm-cream-100/20 p-3 rounded-lg group-hover:bg-fbm-gold-400/20 transition-all duration-300">
+                <MessageCircle className="w-6 h-6 text-fbm-gold-400" />
+              </div>
+              <div>
+                <h3 className="font-serif text-2xl md:text-3xl text-fbm-gold-400 mb-2">
+                  WhatsApp
+                </h3>
+                <p className="text-white/60 mb-4 text-sm leading-relaxed">
+                  Hızlı iletişim ve detaylı bilgi almak için bize WhatsApp üzerinden ulaşabilirsiniz.
+                </p>
+                <span className="text-white/80 group-hover:text-fbm-gold-400 transition-colors duration-300 flex items-center gap-2 font-medium">
+                  Mesaj Gönder
+                  <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </div>
+            </a>
           </motion.div>
         </div>
 
@@ -135,7 +204,7 @@ export default function IletisimPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
+          transition={{ duration: 0.6, delay: 0.9 }}
           className="bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-8 border border-fbm-sage-200/30"
         >
           <h3 className="font-serif text-2xl md:text-3xl text-fbm-gold-400 mb-6">

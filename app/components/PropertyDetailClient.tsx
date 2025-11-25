@@ -363,71 +363,71 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[90] bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+            className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-md flex items-center justify-center p-4"
             onClick={() => setIsContactModalOpen(false)}
           >
             <motion.div
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
-              className="bg-fbm-denim-750 w-full max-w-md rounded-xl border border-fbm-gold-400/20 shadow-[0_0_50px_rgba(0,0,0,0.7)] overflow-hidden relative"
+              className="bg-[#1b2838] w-full max-w-lg rounded-xl border border-fbm-gold-400 shadow-2xl shadow-black/50 overflow-hidden relative"
               onClick={(e) => e.stopPropagation()}
             >
               <button 
                 onClick={() => setIsContactModalOpen(false)} 
-                className="absolute top-4 right-4 text-white/40 hover:text-red-400 transition-colors z-10"
+                className="absolute top-4 right-4 text-fbm-gold-400 hover:text-white transition-colors z-10"
               >
                 <X className="w-6 h-6" />
               </button>
 
-              <div className="p-8">
-                <div className="text-center mb-8">
+              <div className="p-8 md:p-10">
+                <div className="mb-8">
                    <h3 className="text-3xl font-serif text-fbm-gold-400 mb-2">İletişime Geç</h3>
-                   <p className="text-sm text-white/60 font-sans border-b border-white/10 pb-4 mx-auto max-w-[200px]">
+                   <p className="text-sm text-white/60 font-sans">
                       {property.title}
                    </p>
                 </div>
 
                 {formStatus === 'success' ? (
                   <div className="text-center py-8 animate-reveal-line">
-                    <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4 drop-shadow-lg" />
+                    <CheckCircle className="w-16 h-16 text-fbm-gold-400 mx-auto mb-4 drop-shadow-lg" />
                     <h4 className="text-xl text-white font-bold mb-2">Talebiniz Alındı</h4>
                     <p className="text-white/60">En kısa sürede size dönüş yapacağız.</p>
                   </div>
                 ) : (
                   <form onSubmit={handleContactSubmit} className="space-y-5 font-sans">
                     <div>
-                      <label className="block text-xs font-bold text-fbm-gold-400/80 uppercase tracking-wider mb-1">Adınız Soyadınız</label>
+                      <label className="block text-xs text-fbm-gold-400 mb-1 font-bold tracking-wider">ADINIZ SOYADINIZ</label>
                       <input 
                         name="name" 
                         required 
                         placeholder="Ad Soyad" 
-                        className="w-full bg-fbm-navy-900/50 p-3 rounded border border-white/10 text-white placeholder:text-white/30 focus:border-fbm-gold-400 focus:bg-fbm-navy-900 outline-none transition-all" 
+                        className="w-full bg-[#24364b] p-3 rounded border border-fbm-gold-400/20 focus:border-fbm-gold-400 outline-none text-white placeholder:text-white/20 transition-colors" 
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-fbm-gold-400/80 uppercase tracking-wider mb-1">Telefon</label>
+                      <label className="block text-xs text-fbm-gold-400 mb-1 font-bold tracking-wider">TELEFON</label>
                       <input 
                         name="phone" 
                         required 
                         placeholder="0555 555 55 55" 
-                        className="w-full bg-fbm-navy-900/50 p-3 rounded border border-white/10 text-white placeholder:text-white/30 focus:border-fbm-gold-400 focus:bg-fbm-navy-900 outline-none transition-all" 
+                        className="w-full bg-[#24364b] p-3 rounded border border-fbm-gold-400/20 focus:border-fbm-gold-400 outline-none text-white placeholder:text-white/20 transition-colors" 
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-fbm-gold-400/80 uppercase tracking-wider mb-1">Mesajınız</label>
+                      <label className="block text-xs text-fbm-gold-400 mb-1 font-bold tracking-wider">MESAJINIZ</label>
                       <textarea 
                         name="note" 
                         rows={4} 
                         defaultValue={`Merhaba, "${property.title}" ilanı hakkında detaylı bilgi almak istiyorum.`}
-                        className="w-full bg-fbm-navy-900/50 p-3 rounded border border-white/10 text-white focus:border-fbm-gold-400 focus:bg-fbm-navy-900 outline-none transition-all resize-none text-sm"
+                        className="w-full bg-[#24364b] p-3 rounded border border-fbm-gold-400/20 focus:border-fbm-gold-400 outline-none text-white placeholder:text-white/20 transition-colors resize-none text-sm"
                       ></textarea>
                     </div>
 
                     <button 
                       type="submit" 
                       disabled={formStatus === 'sending'}
-                      className="w-full bg-fbm-gold-400 text-fbm-navy-900 font-bold py-4 rounded hover:bg-fbm-bronze-400 hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(188,150,72,0.3)] mt-4"
+                      className="w-full bg-fbm-gold-400 text-fbm-navy-900 font-bold py-4 rounded hover:bg-fbm-bronze-400 hover:scale-[1.01] transition-all duration-300 flex items-center justify-center gap-2 shadow-lg mt-6 border border-fbm-gold-400"
                     >
                       {formStatus === 'sending' ? (
                         'İletiliyor...'
