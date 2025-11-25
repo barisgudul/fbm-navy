@@ -9,8 +9,28 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const bodoni = Bodoni_Moda({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-bodoni" });
 
 export const metadata: Metadata = {
-  title: "FBM Emlak & Tasarım",
-  description: "Lüks konut ve tasarım çözümleri.",
+  metadataBase: new URL('https://www.fbm-gayrimenkul-tasarim.com'),
+  title: {
+    default: "FBM Emlak Isparta | Satılık & Kiralık Daire, Villa, Arsa",
+    template: "%s | FBM Emlak Isparta"
+  },
+  description: "Isparta'da güvenilir emlak danışmanlığı. Merkez, Eğirdir ve Yalvaç'ta en uygun satılık daireler, kiralık evler ve mimari tasarım çözümleri FBM Emlak'ta.",
+  keywords: ['Isparta Emlak', 'Isparta Satılık Daire', 'Isparta Kiralık Ev', 'Ferah Tabak', 'Bolat Çelebi', 'Isparta Mimarlık'],
+  openGraph: {
+    title: 'FBM Emlak Isparta',
+    description: 'Isparta ve çevresinde lüks konut, arsa ve mimari tasarım çözümleri.',
+    url: 'https://www.fbm-gayrimenkul-tasarim.com',
+    siteName: 'FBM Emlak',
+    images: [
+      {
+        url: '/logo.png',
+        width: 800,
+        height: 600,
+      },
+    ],
+    locale: 'tr_TR',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({

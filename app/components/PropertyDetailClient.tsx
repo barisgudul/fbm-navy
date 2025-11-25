@@ -5,7 +5,7 @@ import { useEffect, useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/app/lib/supabaseClient';
 import Image from 'next/image';
-import { Bed, Bath, Square, ArrowLeft, MapPin, X, ChevronLeft, ChevronRight, Maximize2, Send, CheckCircle } from 'lucide-react';
+import { Bed, Bath, Square, ArrowLeft, MapPin, X, ChevronLeft, ChevronRight, Maximize2, Send, CheckCircle, Play } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PropertyCard } from '@/app/components/PropertyCard';
 
@@ -15,11 +15,13 @@ interface Property {
   location: string;
   price: string;
   area: number;
+  floor?: string;
   rooms: number;
   livingRoom: number;
   bathrooms: number;
   description: string;
   images: string[];
+  videos?: string[]; // Yeni alan (opsiyonel olabilir)
   type?: string;
 }
 
@@ -57,6 +59,14 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+
+  // Görseller ve Videoları Birleştirme Mantığı
+  const mediaItems = [
+    ...(property?.images || []).map(url => ({ type: 'image', url })),
+    ...(property?.videos || []).map(url => ({ type: 'video', url }))
+  ];
+
+  const activeMedia = mediaItems[activeImageIndex];
 
   useEffect(() => {
     async function fetchRelatedProperties() {
@@ -101,13 +111,13 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
   const handleNextImage = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (!property) return;
-    setActiveImageIndex((prevIndex) => (prevIndex + 1) % property.images.length);
+    setActiveImageIndex((prevIndex) => (prevIndex + 1) % mediaItems.length);
   };
 
   const handlePrevImage = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (!property) return;
-    setActiveImageIndex((prevIndex) => (prevIndex - 1 + property.images.length) % property.images.length);
+    setActiveImageIndex((prevIndex) => (prevIndex - 1 + mediaItems.length) % mediaItems.length);
   };
 
   const handleContactSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -156,8 +166,6 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
     );
   }
 
-  const currentActiveImage = property.images[activeImageIndex];
-
   return (
     <main className="min-h-screen pt-36 md:pt-40 pb-20 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto max-w-6xl">
@@ -167,13 +175,37 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           <div className="relative h-96 lg:h-[500px] rounded-lg overflow-hidden border border-fbm-gold-400/20 group bg-black/20">
-            <motion.div key={activeImageIndex} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="relative w-full h-full">
-              <Image src={currentActiveImage} alt={property.title} fill className="object-cover cursor-pointer" priority onClick={() => openLightbox(activeImageIndex)} />
+            <motion.div key={activeImageIndex} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="relative w-full h-full flex items-center justify-center bg-black">
+              
+              {/* Video mu Resim mi Kontrolü */}
+              {activeMedia?.type === 'video' ? (
+                <video 
+                  src={activeMedia.url} 
+                  controls 
+                  className="w-full h-full object-contain"
+                  // Videoya tıklandığında lightbox açılmasın istiyorsanız onClick'i kaldırın
+                />
+              ) : (
+                <Image 
+                  src={activeMedia?.url || '/logo.png'} 
+                  alt={property.title} 
+                  fill 
+                  className="object-cover cursor-pointer" 
+                  priority 
+                  onClick={() => openLightbox(activeImageIndex)} 
+                />
+              )}
+
             </motion.div>
-            <button onClick={() => openLightbox(activeImageIndex)} className="absolute top-4 right-4 bg-fbm-navy-900/60 p-2 rounded-full text-fbm-gold-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm z-10 hover:scale-110">
-               <Maximize2 className="w-5 h-5" />
-            </button>
-            {property.images.length > 1 && (
+            
+            {/* Video değilse veya video olsa bile lightbox açmak isterseniz bu butonu tutabilirsiniz */}
+            {activeMedia?.type !== 'video' && (
+                <button onClick={() => openLightbox(activeImageIndex)} className="absolute top-4 right-4 bg-fbm-navy-900/60 p-2 rounded-full text-fbm-gold-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm z-10 hover:scale-110">
+                <Maximize2 className="w-5 h-5" />
+                </button>
+            )}
+
+            {mediaItems.length > 1 && (
               <>
                 <button onClick={handlePrevImage} className="absolute left-4 top-1/2 -translate-y-1/2 bg-fbm-navy-900/60 p-2 rounded-full text-fbm-gold-400 hover:bg-fbm-gold-400 hover:text-fbm-navy-900 transition-all opacity-0 group-hover:opacity-100 duration-300 backdrop-blur-sm z-10">
                   <ChevronLeft className="w-6 h-6" />
@@ -224,6 +256,7 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
             <h2 className="font-serif text-3xl text-fbm-gold-400 mb-6">Genel Bilgiler</h2>
             <div className="space-y-4 text-white/80">
               <div className="flex justify-between pb-3 border-b border-fbm-sage-200/20"><span className="text-white/60">Konum:</span> <span className="font-semibold">{property.location}</span></div>
+              <div className="flex justify-between pb-3 border-b border-fbm-sage-200/20"><span className="text-white/60">Bulunduğu Kat:</span> <span className="font-semibold">{property.floor || '-'}</span></div>
               <div className="flex justify-between pb-3 border-b border-fbm-sage-200/20"><span className="text-white/60">Oda:</span> <span className="font-semibold">{property.rooms} + {property.livingRoom}</span></div>
               <div className="flex justify-between pb-3 border-b border-fbm-sage-200/20"><span className="text-white/60">Banyo:</span> <span className="font-semibold">{property.bathrooms}</span></div>
               <div className="flex justify-between"><span className="text-white/60">Alan:</span> <span className="font-semibold">{property.area} m²</span></div>
@@ -235,13 +268,34 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
           </div>
         </div>
 
-        {property.images.length > 0 && (
+        {mediaItems.length > 0 && (
           <div className="mt-12">
-            <h2 className="font-serif text-3xl text-fbm-gold-400 mb-6">Tüm Fotoğraflar</h2>
+            <h2 className="font-serif text-3xl text-fbm-gold-400 mb-6">Galeri ({mediaItems.length})</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {property.images.map((img, index) => (
-                <div key={index} onClick={() => openLightbox(index)} className={`relative h-32 rounded-lg overflow-hidden cursor-pointer transition-all duration-300 border-2 ${index === activeImageIndex ? 'border-fbm-gold-400 scale-105' : 'border-transparent opacity-80 hover:opacity-100'}`}>
-                  <Image src={img} alt="galeri" fill className="object-cover" />
+              {mediaItems.map((item, index) => (
+                <div 
+                  key={index} 
+                  onClick={() => { setActiveImageIndex(index); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
+                  className={`relative h-32 rounded-lg overflow-hidden cursor-pointer transition-all duration-500 border-2 bg-black/40 group ${index === activeImageIndex ? 'border-white scale-105 shadow-[0_0_20px_rgba(255,255,255,0.5)] opacity-100' : 'border-fbm-sage-200/30 opacity-70 hover:opacity-100 hover:border-white'}`}
+                >
+                  {item.type === 'video' ? (
+                    <div className="w-full h-full flex items-center justify-center relative">
+                       <video src={item.url} className="w-full h-full object-cover pointer-events-none" />
+                       <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
+                         <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 text-white group-hover:bg-fbm-gold-400 group-hover:text-fbm-navy-900 group-hover:scale-110 transition-all duration-300">
+                           <Play className="w-5 h-5 fill-current" />
+                         </div>
+                       </div>
+                    </div>
+                  ) : (
+                  <Image 
+                    src={item.url} 
+                    alt="galeri" 
+                    fill 
+                    className="object-cover"
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                  />
+                  )}
                 </div>
               ))}
             </div>
@@ -266,18 +320,38 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-fbm-navy-900/90 flex items-center justify-center backdrop-blur-lg" onClick={() => setIsLightboxOpen(false)}>
             <button onClick={() => setIsLightboxOpen(false)} className="absolute top-6 right-6 text-white/70 hover:text-white z-50 text-3xl p-2"><X /></button>
             <div className="relative w-full h-full max-w-7xl max-h-[90vh] p-4 flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-              <motion.div key={activeImageIndex} initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="relative w-full h-full border border-fbm-gold-400/50 rounded-lg overflow-hidden">
-                <Image src={property.images[activeImageIndex]} alt="lightbox" fill className="object-contain" />
+              <motion.div 
+                key={activeImageIndex} 
+                initial={{ opacity: 0, scale: 0.95 }} 
+                animate={{ opacity: 1, scale: 1 }} 
+                transition={{ duration: 0.3 }}
+                className="relative w-full h-full flex items-center justify-center"
+              >
+                {mediaItems[activeImageIndex].type === 'video' ? (
+                   <video src={mediaItems[activeImageIndex].url} controls autoPlay className="w-full h-full object-contain max-h-[85vh]" />
+                ) : (
+                   <div className="relative w-full h-full">
+                     <Image 
+                       src={mediaItems[activeImageIndex].url} 
+                       alt="lightbox" 
+                       fill 
+                       className="object-contain" 
+                       sizes="100vw"
+                       quality={90}
+                       priority
+                     />
+                   </div>
+                )}
               </motion.div>
             </div>
-            {property.images.length > 1 && (
+            {mediaItems.length > 1 && (
               <>
                 <button onClick={handlePrevImage} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 p-3 rounded-full text-white hover:bg-fbm-gold-400 hover:text-black transition-all"><ChevronLeft className="w-8 h-8" /></button>
                 <button onClick={handleNextImage} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 p-3 rounded-full text-white hover:bg-fbm-gold-400 hover:text-black transition-all"><ChevronRight className="w-8 h-8" /></button>
               </>
             )}
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 font-sans bg-black/50 px-4 py-1 rounded-full text-sm md:text-base">
-               {activeImageIndex + 1} / {property.images.length}
+               {activeImageIndex + 1} / {mediaItems.length}
             </div>
           </motion.div>
         )}

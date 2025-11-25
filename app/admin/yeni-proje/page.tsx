@@ -14,6 +14,10 @@ export default function YeniProjePage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   
+  // Video State'leri
+  const [selectedVideos, setSelectedVideos] = useState<File[]>([]);
+  const [videoPreviews, setVideoPreviews] = useState<string[]>([]);
+
   useEffect(() => {
     async function checkAuth() {
       const { data: { session } } = await supabase.auth.getSession();
@@ -50,6 +54,30 @@ export default function YeniProjePage() {
     });
   };
 
+  // Video İşlemleri
+  const handleVideoChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newVideos = Array.from(e.target.files);
+
+      if (selectedVideos.length + newVideos.length > 2) {
+        alert('En fazla 2 video yükleyebilirsiniz.');
+        return;
+      }
+      setSelectedVideos(prev => [...prev, ...newVideos]);
+      const newPreviews = newVideos.map(file => URL.createObjectURL(file));
+      setVideoPreviews(prev => [...prev, ...newPreviews]);
+      e.target.value = '';
+    }
+  };
+
+  const removeVideo = (indexToRemove: number) => {
+    setSelectedVideos(prev => prev.filter((_, index) => index !== indexToRemove));
+    setVideoPreviews(prev => {
+      URL.revokeObjectURL(prev[indexToRemove]);
+      return prev.filter((_, index) => index !== indexToRemove);
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -63,6 +91,7 @@ export default function YeniProjePage() {
     }
 
     const imageUrls: string[] = [];
+    const videoUrls: string[] = [];
 
     try {
       for (let i = 0; i < selectedFiles.length; i++) {
@@ -84,6 +113,26 @@ export default function YeniProjePage() {
         imageUrls.push(urlData.publicUrl);
       }
 
+      // Video Yükleme
+      for (let i = 0; i < selectedVideos.length; i++) {
+        const file = selectedVideos[i];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `video-${Date.now()}-${i}.${fileExt}`;
+        const filePath = fileName;
+
+        const { error: uploadError } = await supabase.storage
+          .from('design-images') // Videoları da aynı bucket'a atabiliriz
+          .upload(filePath, file);
+          
+        if (uploadError) throw uploadError;
+        
+        const { data: urlData } = supabase.storage
+          .from('design-images')
+          .getPublicUrl(filePath);
+          
+        videoUrls.push(urlData.publicUrl);
+      }
+
       const { error: insertError } = await supabase.from('designs').insert({
         title: formData.get('title'),
         type: formData.get('type'),
@@ -91,6 +140,7 @@ export default function YeniProjePage() {
         area: Number(formData.get('area')),
         year: Number(formData.get('year')),
         image_urls: imageUrls,
+        video_urls: videoUrls,
         description: formData.get('description'),
       });
 
@@ -197,6 +247,28 @@ export default function YeniProjePage() {
             {selectedFiles.length > 0 && (
                <p className="text-xs text-green-400 text-center">{selectedFiles.length} fotoğraf seçildi.</p>
             )}
+          </div>
+
+          {/* Video Alanı */}
+          <div className="space-y-4 border-t border-white/10 pt-4 mt-4">
+            <label className="block text-sm font-bold text-fbm-gold-400">Videolar</label>
+            
+            <div className="grid grid-cols-3 gap-3">
+                {videoPreviews.map((url, index) => (
+                    <div key={`vid-${index}`} className="relative aspect-video rounded-lg overflow-hidden border border-blue-500/30 group bg-black">
+                        <video src={url} className="w-full h-full object-contain bg-black" controls />
+                        <button type="button" onClick={() => removeVideo(index)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs z-10">
+                            X
+                        </button>
+                    </div>
+                ))}
+                
+                <label className="aspect-video rounded border-2 border-dashed border-white/20 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-colors text-white/50 hover:text-white hover:border-white/40 relative">
+                    <span className="text-2xl">🎥</span>
+                    <span className="text-xs mt-1">Video Ekle veya Sürükle</span>
+                    <input type="file" multiple accept="video/*" onChange={handleVideoChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                </label>
+            </div>
           </div>
 
           <button 

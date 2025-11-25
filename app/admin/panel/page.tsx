@@ -142,7 +142,7 @@ export default function AdminPanelPage() {
   if (loading) return <div className="min-h-screen bg-fbm-navy-900 flex items-center justify-center text-fbm-gold-400">Yükleniyor...</div>;
 
   return (
-    <main className="min-h-screen pt-32 px-4 pb-20 bg-fbm-navy-900 text-white font-sans">
+    <main className="min-h-screen pt-40 md:pt-48 px-4 pb-20 bg-fbm-navy-900 text-white font-sans">
       <div className="container mx-auto max-w-7xl">
         
         {/* Üst Başlık ve Butonlar */}

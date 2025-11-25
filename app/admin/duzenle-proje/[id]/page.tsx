@@ -27,6 +27,11 @@ export default function EditDesignPage() {
   const [newFiles, setNewFiles] = useState<File[]>([]);
   const [newPreviews, setNewPreviews] = useState<string[]>([]);
 
+  // Video State'leri
+  const [existingVideos, setExistingVideos] = useState<string[]>([]);
+  const [newVideos, setNewVideos] = useState<File[]>([]);
+  const [newVideoPreviews, setNewVideoPreviews] = useState<string[]>([]);
+
   useEffect(() => {
     const checkAuthAndFetch = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -54,6 +59,7 @@ export default function EditDesignPage() {
           description: data.description || ''
         });
         setExistingImages(data.image_urls || []);
+        setExistingVideos(data.video_urls || []);
       }
       setLoading(false);
     };
@@ -90,6 +96,35 @@ export default function EditDesignPage() {
     });
   };
 
+  // Video İşlemleri
+  const handleVideoChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const files = Array.from(e.target.files);
+      if (existingVideos.length + newVideos.length + files.length > 2) {
+        alert('En fazla 2 video yükleyebilirsiniz.');
+        return;
+      }
+      setNewVideos(prev => [...prev, ...files]);
+      const previews = files.map(file => URL.createObjectURL(file));
+      setNewVideoPreviews(prev => [...prev, ...previews]);
+      e.target.value = '';
+    }
+  };
+
+  const removeExistingVideo = (index: number) => {
+    if(window.confirm("Bu videoyu silmek istediğinize emin misiniz?")) {
+        setExistingVideos(prev => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  const removeNewVideo = (index: number) => {
+    setNewVideos(prev => prev.filter((_, i) => i !== index));
+    setNewVideoPreviews(prev => {
+      URL.revokeObjectURL(prev[index]);
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -114,13 +149,35 @@ export default function EditDesignPage() {
         uploadedUrls.push(urlData.publicUrl);
       }
 
+      // 2. Yeni Videoları Yükle
+      const uploadedVideoUrls: string[] = [];
+      for (let i = 0; i < newVideos.length; i++) {
+        const file = newVideos[i];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `video-${Date.now()}-${i}-design-edit.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('design-images') // Videoları da design-images bucket'ına yükleyebiliriz
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+          .from('design-images')
+          .getPublicUrl(fileName);
+
+        uploadedVideoUrls.push(urlData.publicUrl);
+      }
+
       const finalImages = [...existingImages, ...uploadedUrls];
+      const finalVideos = [...existingVideos, ...uploadedVideoUrls];
 
       const { error: updateError } = await supabase
         .from('designs')
         .update({
           ...formData,
-          image_urls: finalImages
+          image_urls: finalImages,
+          video_urls: finalVideos
         })
         .eq('id', params.id);
 
@@ -140,7 +197,7 @@ export default function EditDesignPage() {
   if (loading) return <div className="min-h-screen bg-fbm-navy-900 flex items-center justify-center text-white">Yükleniyor...</div>;
 
   return (
-    <main className="min-h-screen pt-32 px-4 pb-20 bg-fbm-navy-900 text-white">
+    <main className="min-h-screen pt-40 md:pt-48 px-4 pb-20 bg-fbm-navy-900 text-white">
       <div className="max-w-3xl mx-auto bg-fbm-denim-750 p-8 rounded-xl border border-fbm-gold-400/30 shadow-2xl">
         
         <div className="flex items-center justify-between mb-8">
@@ -194,7 +251,7 @@ export default function EditDesignPage() {
             <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
                 {existingImages.map((url, idx) => (
                     <div key={`old-${idx}`} className="relative aspect-square rounded border border-green-500/30 group">
-                        <Image src={url} alt="Mevcut" fill className="object-cover rounded" />
+                        <Image src={url} alt="Mevcut" fill className="object-cover rounded" sizes="(max-width: 640px) 25vw, 20vw" />
                         <button type="button" onClick={() => removeExistingImage(idx)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs z-10">
                             <X size={12} />
                         </button>
@@ -202,7 +259,7 @@ export default function EditDesignPage() {
                 ))}
                 {newPreviews.map((url, idx) => (
                     <div key={`new-${idx}`} className="relative aspect-square rounded border border-yellow-500/30 group">
-                        <Image src={url} alt="Yeni" fill className="object-cover rounded" />
+                        <Image src={url} alt="Yeni" fill className="object-cover rounded" sizes="(max-width: 640px) 25vw, 20vw" />
                         <div className="absolute bottom-0 left-0 right-0 bg-yellow-500/80 text-black text-[10px] text-center py-1">YENİ</div>
                         <button type="button" onClick={() => removeNewFile(idx)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs z-10">
                             <X size={12} />
@@ -210,10 +267,43 @@ export default function EditDesignPage() {
                     </div>
                 ))}
                 
-                <label className="aspect-square rounded border-2 border-dashed border-white/20 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-colors text-white/50 hover:text-white hover:border-white/40">
+                <label className="aspect-square rounded border-2 border-dashed border-white/20 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-colors text-white/50 hover:text-white hover:border-white/40 relative">
                     <Plus size={24} />
-                    <span className="text-xs mt-1">Ekle</span>
-                    <input type="file" multiple accept="image/*" onChange={handleFileChange} className="hidden" />
+                    <span className="text-xs mt-1">Ekle/Sürükle</span>
+                    <input type="file" multiple accept="image/*" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                </label>
+            </div>
+          </div>
+
+          {/* Video Yönetimi */}
+          <div className="space-y-4 border-t border-white/10 pt-4">
+            <label className="block text-sm font-bold text-fbm-gold-400">Videolar</label>
+            
+            <div className="grid grid-cols-3 gap-3">
+                {existingVideos.map((url, idx) => (
+                    <div key={`old-vid-${idx}`} className="relative aspect-video rounded-lg overflow-hidden border border-green-500/30 group bg-black">
+                        <video src={url} className="w-full h-full object-contain bg-black" controls />
+                        <div className="absolute top-0 right-0 p-1">
+                           <button type="button" onClick={() => removeExistingVideo(idx)} className="bg-red-600 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs z-10">
+                               <X size={12} />
+                           </button>
+                        </div>
+                    </div>
+                ))}
+                {newVideoPreviews.map((url, idx) => (
+                    <div key={`new-vid-${idx}`} className="relative aspect-video rounded-lg overflow-hidden border border-yellow-500/30 group bg-black">
+                        <video src={url} className="w-full h-full object-contain bg-black" controls />
+                        <div className="absolute bottom-0 left-0 right-0 bg-yellow-500/80 text-black text-[10px] text-center py-1">YENİ</div>
+                        <button type="button" onClick={() => removeNewVideo(idx)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs z-10">
+                            <X size={12} />
+                        </button>
+                    </div>
+                ))}
+                
+                <label className="aspect-video rounded border-2 border-dashed border-white/20 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-colors text-white/50 hover:text-white hover:border-white/40 relative">
+                    <span className="text-2xl">🎥</span>
+                    <span className="text-xs mt-1">Ekle/Sürükle</span>
+                    <input type="file" multiple accept="video/*" onChange={handleVideoChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
                 </label>
             </div>
           </div>

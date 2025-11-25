@@ -1,9 +1,10 @@
 /* app/mekan-tasarimlari/[id]/DesignDetailClient.tsx */
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Square, ArrowLeft, MapPin, Calendar } from 'lucide-react';
+import { Square, ArrowLeft, MapPin, Calendar, Play } from 'lucide-react';
 
 interface Design {
   id: number;
@@ -15,10 +16,20 @@ interface Design {
   image: string;
   description?: string;
   images?: string[];
+  videos?: string[];
 }
 
 export default function DesignDetailClient({ initialDesign }: { initialDesign: Design }) {
   const router = useRouter();
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  // Görseller ve Videoları Birleştirme Mantığı
+  const mediaItems = [
+    ...(initialDesign?.images || []).map(url => ({ type: 'image', url })),
+    ...(initialDesign?.videos || []).map(url => ({ type: 'video', url }))
+  ];
+  
+  const activeMedia = mediaItems[activeImageIndex] || (initialDesign?.image ? { type: 'image', url: initialDesign.image } : null);
 
   if (!initialDesign) {
     return (
@@ -43,15 +54,23 @@ export default function DesignDetailClient({ initialDesign }: { initialDesign: D
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          <div className="relative h-96 lg:h-[500px] rounded-lg overflow-hidden">
-            {initialDesign.image ? (
-              <Image
-                src={initialDesign.image}
-                alt={initialDesign.title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
+          <div className="relative h-96 lg:h-[500px] rounded-lg overflow-hidden bg-black flex items-center justify-center">
+            {activeMedia ? (
+              activeMedia.type === 'video' ? (
+                <video 
+                  src={activeMedia.url} 
+                  controls 
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <Image
+                  src={activeMedia.url}
+                  alt={initialDesign.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              )
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-fbm-navy-900 via-fbm-denim-750 to-fbm-gold-400">
                 <Square className="w-20 h-20 text-fbm-gold-400/30" />
@@ -146,18 +165,34 @@ export default function DesignDetailClient({ initialDesign }: { initialDesign: D
           </p>
         </div>
 
-        {initialDesign.images && initialDesign.images.length > 1 && (
+        {mediaItems.length > 1 && (
           <div className="mt-12">
-            <h2 className="font-serif text-3xl text-fbm-gold-400 mb-6">Tüm Fotoğraflar</h2>
+            <h2 className="font-serif text-3xl text-fbm-gold-400 mb-6">Galeri ({mediaItems.length})</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {initialDesign.images.map((img, index) => (
-                <div key={index} className="relative h-32 rounded-lg overflow-hidden cursor-pointer transition-all duration-300 border-2 border-transparent hover:border-fbm-gold-400 hover:scale-[1.03] group">
-                  <Image
-                    src={img}
-                    alt={`${initialDesign.title} - ${index + 1}`}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
+              {mediaItems.map((item, index) => (
+                <div 
+                  key={index} 
+                  onClick={() => { setActiveImageIndex(index); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  className={`relative h-32 rounded-lg overflow-hidden cursor-pointer transition-all duration-500 border-2 bg-black/40 group ${index === activeImageIndex ? 'border-white scale-105 shadow-[0_0_20px_rgba(255,255,255,0.5)] opacity-100' : 'border-fbm-sage-200/30 opacity-70 hover:opacity-100 hover:border-white hover:scale-[1.02]'}`}
+                >
+                  {item.type === 'video' ? (
+                    <div className="w-full h-full flex items-center justify-center relative">
+                       <video src={item.url} className="w-full h-full object-cover pointer-events-none" />
+                       <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
+                         <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 text-white group-hover:bg-fbm-gold-400 group-hover:text-fbm-navy-900 group-hover:scale-110 transition-all duration-300">
+                           <Play className="w-5 h-5 fill-current" />
+                         </div>
+                       </div>
+                    </div>
+                  ) : (
+                    <Image
+                      src={item.url}
+                      alt={`${initialDesign.title} - ${index + 1}`}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                    />
+                  )}
                 </div>
               ))}
             </div>
