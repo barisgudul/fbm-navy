@@ -17,11 +17,9 @@ export function SocialShare({ title, description, url }: SocialShareProps) {
   // WhatsApp için şık mesaj formatı
   const whatsappMessage = `🏠 *${title}*
 
-📍 ${description}
+🔗 ${url}
 
-🔗 Detaylar için: ${url}
-
-_FBM Gayrimenkul ile hayalinizdeki eve ulaşın_`;
+_FBM Gayrimenkul_`;
 
   const shareLinks = {
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
