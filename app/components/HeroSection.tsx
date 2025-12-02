@@ -4,7 +4,6 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
 
 // Anlatı metinlerini bir veri yapısında saklayalım
 const narratives = [
@@ -90,16 +89,6 @@ export function HeroSection() {
           </motion.div>
         </AnimatePresence>
       </div>
-      
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 0.8 }}
-        className="absolute bottom-10 right-10 z-20 flex items-center space-x-3"
-      >
-        <span className="font-sans text-sm uppercase tracking-widest text-white">Portfolyo</span>
-        <ArrowRight className="w-8 h-8 text-fbm-gold-400 animate-pulse" />
-      </motion.div>
     </section>
   );
 }
