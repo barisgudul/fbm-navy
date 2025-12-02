@@ -149,16 +149,33 @@ export default function YeniIlanPage() {
     try {
       for (let i = 0; i < selectedFiles.length; i++) {
         const file = selectedFiles[i];
+        
+        // Debug: Dosya bilgilerini logla
+        console.log(`Yükleniyor [${i + 1}/${selectedFiles.length}]:`, {
+          name: file.name,
+          size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+          type: file.type
+        });
+        
         // Dosya ismini temizle ve benzersiz yap
-        const fileExt = file.name.split('.').pop();
+        const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
         const fileName = `${Date.now()}-${i}.${fileExt}`;
         const filePath = fileName;
 
-        const { error: uploadError } = await supabase.storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
           .from('property-images')
-          .upload(filePath, file);
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+        
+        // Debug: Upload sonucunu logla
+        console.log('Upload sonucu:', { uploadData, uploadError });
           
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('Upload hatası detayı:', uploadError);
+          throw uploadError;
+        }
         
         const { data: urlData } = supabase.storage
           .from('property-images')
@@ -170,15 +187,32 @@ export default function YeniIlanPage() {
       // YENİ: Video Yükleme Döngüsü
       for (let i = 0; i < selectedVideos.length; i++) {
         const file = selectedVideos[i];
-        const fileExt = file.name.split('.').pop();
+        
+        // Debug: Video bilgilerini logla
+        console.log(`Video yükleniyor [${i + 1}/${selectedVideos.length}]:`, {
+          name: file.name,
+          size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+          type: file.type
+        });
+        
+        const fileExt = file.name.split('.').pop()?.toLowerCase() || 'mp4';
         const fileName = `video-${Date.now()}-${i}.${fileExt}`;
         const filePath = fileName;
 
-        const { error: uploadError } = await supabase.storage
-          .from('property-images') // Videoları da aynı bucket'a atabiliriz veya yeni bucket açabilirsiniz
-          .upload(filePath, file);
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('property-images')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+        
+        // Debug: Upload sonucunu logla
+        console.log('Video upload sonucu:', { uploadData, uploadError });
           
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('Video upload hatası detayı:', uploadError);
+          throw uploadError;
+        }
         
         const { data: urlData } = supabase.storage
           .from('property-images')
