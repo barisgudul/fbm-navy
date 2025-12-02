@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Square, ArrowLeft, MapPin, Calendar, Play } from 'lucide-react';
+import { SocialShare } from '@/app/components/SocialShare';
 
 interface Design {
   id: number;
@@ -115,6 +116,16 @@ export default function DesignDetailClient({ initialDesign }: { initialDesign: D
               İletişime Geç
             </button>
           </div>
+        </div>
+
+        {/* Sosyal Medya Paylaşım */}
+        <div className="mb-8 bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-6 border border-fbm-sage-200/30">
+          <SocialShare 
+            title={initialDesign.title}
+            description={initialDesign.description || `${initialDesign.title} - ${initialDesign.type} mekan tasarımı projesi, ${initialDesign.location}`}
+            url={typeof window !== 'undefined' ? window.location.href : ''}
+            image={initialDesign.images?.[0] || initialDesign.image}
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

@@ -217,7 +217,7 @@ export default function AdminPanelPage() {
                   <td className="p-4">
                     <div className="relative w-32 h-24 rounded overflow-hidden border border-white/10 bg-fbm-navy-900/50">
                       <Image 
-                        src={property.image_urls?.[0] || '/logo.png'} 
+                        src={property.image_urls?.[0] || '/fbm-logo.png'} 
                         alt={property.title} 
                         fill 
                         className={property.image_urls?.[0] ? "object-cover" : "object-contain p-2"}
@@ -289,7 +289,7 @@ export default function AdminPanelPage() {
                     <td className="p-4">
                     <div className="relative w-32 h-24 rounded overflow-hidden border border-white/10 bg-fbm-navy-900/50">
                         <Image 
-                          src={design.image_urls?.[0] || '/logo.png'} 
+                          src={design.image_urls?.[0] || '/fbm-logo.png'} 
                           alt={design.title} 
                           fill 
                           className={design.image_urls?.[0] ? "object-cover" : "object-contain p-2"}

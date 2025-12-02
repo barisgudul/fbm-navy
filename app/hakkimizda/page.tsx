@@ -3,7 +3,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 
@@ -31,7 +30,7 @@ export default function HakkimizdaPage() {
             Hakkımızda
           </h1>
           <p className="font-sans text-lg md:text-xl text-white/80 text-center max-w-3xl mx-auto leading-relaxed">
-            FBM Emlak & Tasarım, gayrimenkul ve mekan tasarımı alanında uzman ekibimizle, 
+            FBM Gayrimenkul, Isparta ve Burdur bölgesinde gayrimenkul ve mekan tasarımı alanında uzman ekibimizle, 
             hayallerinizi gerçeğe dönüştürmek için buradayız.
           </p>
         </motion.div>
@@ -44,12 +43,12 @@ export default function HakkimizdaPage() {
           className="bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-8 md:p-12 border border-fbm-sage-200/30 mb-12"
         >
           <h2 className="font-serif text-3xl md:text-4xl text-fbm-gold-400 mb-6">
-            FBM Emlak & Tasarım
+            FBM Gayrimenkul & Tasarım
           </h2>
           <div className="space-y-4 text-white/80 leading-relaxed">
             <p>
-              FBM Emlak & Tasarım olarak, Isparta ve çevresinde gayrimenkul sektöründe 
-              güvenilir hizmet sunmayı hedefliyoruz. Satılık ve kiralık konut seçeneklerinden 
+              FBM Gayrimenkul olarak, Isparta ve Burdur bölgesinde (Merkez, Eğirdir, Yalvaç, Burdur, Dinar ve Keçiborlu) 
+              gayrimenkul sektöründe güvenilir hizmet sunmayı hedefliyoruz. Satılık ve kiralık konut seçeneklerinden 
               profesyonel mekan tasarımı hizmetlerine kadar geniş bir yelpazede müşterilerimizin 
               ihtiyaçlarını karşılıyoruz.
             </p>
@@ -75,15 +74,6 @@ export default function HakkimizdaPage() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-8 border border-fbm-sage-200/30"
           >
-            <div className="relative w-full h-64 mb-6 rounded-lg overflow-hidden">
-              <Image
-                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&h=600&fit=crop"
-                alt="Ferah Tabak"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </div>
             <h3 className="font-serif text-2xl md:text-3xl text-fbm-gold-400 mb-4">
               Ferah Tabak
             </h3>
@@ -95,7 +85,7 @@ export default function HakkimizdaPage() {
                 alım-satım ve kiralama konularında uzmanlaşmıştır.
               </p>
               <p>
-                Isparta ve çevresindeki gayrimenkul piyasasına hakimiyeti, müşteri 
+                Isparta ve Burdur bölgesindeki gayrimenkul piyasasına hakimiyeti, müşteri 
                 odaklı yaklaşımı ve detaylara verdiği önem ile sektörde fark yaratmaktadır.
               </p>
               <p>
@@ -112,15 +102,6 @@ export default function HakkimizdaPage() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-8 border border-fbm-sage-200/30"
           >
-            <div className="relative w-full h-64 mb-6 rounded-lg overflow-hidden">
-              <Image
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop"
-                alt="Bolat Çelebi"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </div>
             <h3 className="font-serif text-2xl md:text-3xl text-fbm-gold-400 mb-4">
               Bolat Çelebi
             </h3>
@@ -132,7 +113,7 @@ export default function HakkimizdaPage() {
                 alım-satım ve kiralama konularında uzmanlaşmıştır.
               </p>
               <p>
-                Isparta ve çevresindeki gayrimenkul piyasasına hakimiyeti, müşteri 
+                Isparta ve Burdur bölgesindeki gayrimenkul piyasasına hakimiyeti, müşteri 
                 odaklı yaklaşımı ve detaylara verdiği önem ile sektörde fark yaratmaktadır.
               </p>
               <p>
@@ -166,7 +147,7 @@ export default function HakkimizdaPage() {
               Vizyonumuz
             </h3>
             <p className="text-white/80 leading-relaxed">
-              Isparta ve Türkiye&apos;de gayrimenkul ve mekan tasarımı alanında referans olmak. 
+              Isparta, Burdur ve Türkiye&apos;de gayrimenkul ve mekan tasarımı alanında referans olmak. 
               Yenilikçi yaklaşımlarımız ve müşteri odaklı hizmet anlayışımızla, sektörde 
               öncü bir konumda yer almak ve büyümeye devam etmektir.
             </p>

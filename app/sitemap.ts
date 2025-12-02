@@ -3,7 +3,7 @@ import { MetadataRoute } from 'next'
 import { supabase } from '@/app/lib/supabaseClient'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://www.fbm-gayrimenkul-tasarim.com'
+  const baseUrl = 'https://www.fbmgayrimenkul.com'
 
   // 1. Tüm İlanları Çek (type bilgisi ile)
   const { data: properties } = await supabase
@@ -32,17 +32,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // 3. Statik Sayfalar
   const staticRoutes = [
-    '',
-    '/satilik',
-    '/kiralik',
-    '/mekan-tasarimlari',
-    '/hakkimizda',
-    '/iletisim',
-  ].map((route) => ({
+    { route: '', priority: 1 },
+    { route: '/satilik', priority: 0.9 },
+    { route: '/kiralik', priority: 0.9 },
+    { route: '/mekan-tasarimlari', priority: 0.8 },
+    { route: '/hakkimizda', priority: 0.7 },
+    { route: '/iletisim', priority: 0.8 },
+  ].map(({ route, priority }) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: 'daily' as const,
-    priority: 1,
+    priority,
   }))
 
   return [...staticRoutes, ...propertyUrls, ...designUrls]

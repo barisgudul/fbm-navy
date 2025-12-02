@@ -53,7 +53,7 @@ export default function IletisimPage() {
                   Adres
                 </h3>
                 <p className="text-white/80 leading-relaxed">
-                  Fatih, Toptancılar Cd. Yener İş Merkezi no:59/61, 32200 Merkez/Isparta
+                  Fatih, 201. Cadde Yener İş Merkezi no:59/61, 32200 Merkez/Isparta
                 </p>
               </div>
             </div>
@@ -103,7 +103,7 @@ export default function IletisimPage() {
                   href="mailto:FBMgayrimenkul.32@gmail.com"
                   className="text-white/80 hover:text-fbm-gold-400 transition-colors duration-300"
                 >
-                  FBMgayrimenkul.32@gmail.com
+                  fbmgayrimenkul.32@gmail.com
                 </a>
               </div>
             </div>
@@ -125,8 +125,8 @@ export default function IletisimPage() {
                   Çalışma Saatleri
                 </h3>
                 <div className="space-y-2 text-white/80 leading-relaxed">
-                  <p>Hafta İçi: 09:00 - 18:00</p>
-                  <p>Cumartesi: 09:00 - 14:00</p>
+                  <p>Hafta İçi: 09:00 - 19:00</p>
+                  <p>Cumartesi: 09:00 - 19:00</p>
                   <p>Pazar: Kapalı</p>
                 </div>
               </div>
@@ -207,12 +207,26 @@ export default function IletisimPage() {
           transition={{ duration: 0.6, delay: 0.9 }}
           className="bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-8 border border-fbm-sage-200/30"
         >
-          <h3 className="font-serif text-2xl md:text-3xl text-fbm-gold-400 mb-6">
-            Konumumuz
-          </h3>
-          <div className="w-full h-96 rounded-lg overflow-hidden">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="font-serif text-2xl md:text-3xl text-fbm-gold-400">
+              Konumumuz
+            </h3>
+            <a
+              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent('Fatih, 201. Cadde Yener İş Merkezi no:59/61, 32200 Merkez/Isparta')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-fbm-gold-400 hover:bg-fbm-bronze-400 text-fbm-navy-900 rounded-lg transition-all duration-300 font-medium text-sm group"
+            >
+              <MapPin className="w-4 h-4" />
+              <span>Yol Tarifi Al</span>
+              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+          <div className="w-full h-96 rounded-lg overflow-hidden border border-fbm-gold-400/30">
             <iframe
-              src={`https://www.google.com/maps?q=${encodeURIComponent('Fatih, Toptancılar Cd. Yener İş Merkezi no:59/61, 32200 Merkez/Isparta')}&output=embed`}
+              src={`https://www.google.com/maps?q=${encodeURIComponent('Fatih, 201. Cadde Yener İş Merkezi no:59/61, 32200 Merkez/Isparta')}&output=embed`}
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -220,6 +234,7 @@ export default function IletisimPage() {
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               className="w-full h-full"
+              title="FBM Gayrimenkul - Yener İş Merkezi"
             ></iframe>
           </div>
         </motion.div>

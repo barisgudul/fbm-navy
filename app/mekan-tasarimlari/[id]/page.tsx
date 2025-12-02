@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import { supabase } from '@/app/lib/supabaseClient';
 import DesignDetailClient from './DesignDetailClient';
+import Script from 'next/script';
+import { getBreadcrumbSchema } from '@/app/config/seo';
 
 type Props = {
   params: Promise<{ id: string }>
@@ -17,7 +19,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!data) {
     return {
-      title: 'Proje Bulunamadı | FBM Emlak & Tasarım',
+      title: 'Proje Bulunamadı | FBM Gayrimenkul & Tasarım',
+      description: 'Aradığınız mekan tasarımı projesi bulunamadı. Isparta\'da profesyonel iç mimarlık ve mekan tasarımı projeleri için FBM Gayrimenkul\'ü ziyaret edin.',
     };
   }
 
@@ -25,24 +28,47 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? data.image_urls[0] 
     : 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop';
 
+  const metaDescription = data.description 
+    ? data.description.slice(0, 155) + '...'
+    : `${data.title} - ${data.type} projesi. ${data.area}m² mekan tasarımı, ${data.location}. ${data.year} yılı. FBM Gayrimenkul profesyonel tasarım hizmetleri.`;
+
   // Tasarımlar için SEO başlığı
   return {
-    title: `${data.title} | FBM Mimarlık & Tasarım Isparta`,
-    description: data.description ? data.description.slice(0, 160) : `${data.title} - ${data.type} projesi, ${data.location} bölgesinde.`,
+    title: `${data.title} - ${data.type} Mekan Tasarımı | FBM Gayrimenkul Isparta`,
+    description: metaDescription,
+    keywords: [
+      `Isparta ${data.type} Tasarımı`,
+      `${data.location} Mekan Tasarımı`,
+      'Isparta İç Mimarlık',
+      'Isparta Mekan Tasarımı',
+      'FBM Tasarım',
+      data.type,
+      data.location
+    ],
     openGraph: {
-      title: data.title,
-      description: data.description,
+      title: `${data.title} - ${data.type} Tasarımı`,
+      description: metaDescription,
+      url: `https://www.fbmgayrimenkul.com/mekan-tasarimlari/${id}`,
       images: [
         {
           url: imageUrl,
-          width: 800,
-          height: 600,
-          alt: data.title,
+          width: 1200,
+          height: 630,
+          alt: `${data.title} - ${data.type} Mekan Tasarımı`,
         },
       ],
       type: 'website',
       locale: 'tr_TR',
-      siteName: 'FBM Emlak & Tasarım',
+      siteName: 'FBM Gayrimenkul & Tasarım',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: data.title,
+      description: metaDescription,
+      images: [imageUrl],
+    },
+    alternates: {
+      canonical: `https://www.fbmgayrimenkul.com/mekan-tasarimlari/${id}`,
     },
   };
 }
@@ -82,25 +108,57 @@ export default async function MekanTasarimlariDetailPage({ params }: Props) {
   };
 
   // --- GOOGLE İÇİN GİZLİ YAPISAL VERİ (JSON-LD) ---
-  // Tasarımlar için 'CreativeWork' veya 'Project' şeması daha uygundur.
+  // Tasarımlar için 'CreativeWork' ve 'Service' şeması kombinasyonu
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'CreativeWork',
     name: data.title,
     image: imagesList,
     description: data.description,
-    dateCreated: data.year,
+    dateCreated: data.year.toString(),
     locationCreated: {
       '@type': 'Place',
-      name: data.location
+      name: data.location,
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: data.location,
+        addressRegion: 'Isparta',
+        addressCountry: 'TR'
+      }
     },
     author: {
       '@type': 'Organization',
-      name: 'FBM Emlak & Tasarım',
-      url: 'https://fbmemlak.com' // Site URL'nizi buraya ekleyebilirsiniz
+      name: 'FBM Gayrimenkul & Tasarım',
+      url: 'https://www.fbmgayrimenkul.com'
     },
-    genre: data.type
+    creator: {
+      '@type': 'Organization',
+      name: 'FBM Gayrimenkul',
+      url: 'https://www.fbmgayrimenkul.com'
+    },
+    genre: data.type,
+    inLanguage: 'tr',
+    about: {
+      '@type': 'Service',
+      serviceType: 'İç Mimarlık ve Mekan Tasarımı',
+      provider: {
+        '@type': 'RealEstateAgent',
+        name: 'FBM Gayrimenkul'
+      },
+      areaServed: {
+        '@type': 'City',
+        name: 'Isparta'
+      }
+    }
   };
+
+  // Breadcrumb Schema
+  const breadcrumbItems = [
+    { name: 'Ana Sayfa', url: '/' },
+    { name: 'Mekan Tasarımları', url: '/mekan-tasarimlari' },
+    { name: data.title, url: `/mekan-tasarimlari/${data.id}` }
+  ];
+  const breadcrumbSchema = getBreadcrumbSchema(breadcrumbItems);
 
   return (
     <>
@@ -108,6 +166,14 @@ export default async function MekanTasarimlariDetailPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <Script
+        id="breadcrumb-schema"
+        type="application/ld+json"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbSchema),
+        }}
       />
       
       <DesignDetailClient initialDesign={design} />

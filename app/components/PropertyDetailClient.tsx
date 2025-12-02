@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { Bed, Bath, Square, ArrowLeft, MapPin, X, ChevronLeft, ChevronRight, Maximize2, Send, CheckCircle, Play } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PropertyCard } from '@/app/components/PropertyCard';
+import { SocialShare } from '@/app/components/SocialShare';
 
 interface Property {
   id: number;
@@ -187,7 +188,7 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
                 />
               ) : (
                 <Image 
-                  src={activeMedia?.url || '/logo.png'} 
+                  src={activeMedia?.url || '/fbm-logo.png'} 
                   alt={property.title} 
                   fill 
                   className="object-cover cursor-pointer" 
@@ -249,6 +250,16 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
               İletişime Geç
             </button>
           </div>
+        </div>
+
+        {/* Sosyal Medya Paylaşım */}
+        <div className="mb-8 bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-6 border border-fbm-sage-200/30">
+          <SocialShare 
+            title={property.title}
+            description={property.description || `${property.title} - ${property.rooms}+${property.livingRoom}, ${property.area}m², ${property.location}`}
+            url={typeof window !== 'undefined' ? window.location.href : ''}
+            image={property.images[0]}
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">

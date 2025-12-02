@@ -45,7 +45,7 @@ export default function Navbar() {
                             <div className="relative h-full w-28 md:w-40 flex items-center justify-center">
                                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-fbm-gold-400/0 group-hover:bg-fbm-gold-400/20 blur-3xl rounded-full transition-all duration-700" />
                                 <Image 
-                                    src="/logo.png" 
+                                    src="/fbm-logo.png" 
                                     alt="FBM Logo" 
                                     width={800} 
                                     height={400} 
@@ -120,7 +120,7 @@ export default function Navbar() {
                                         <div className="relative h-16 w-32 flex items-center justify-center">
                                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-fbm-gold-400/0 group-hover:bg-fbm-gold-400/20 blur-3xl rounded-full transition-all duration-700" />
                                             <Image 
-                                                src="/logo.png" 
+                                                src="/fbm-logo.png" 
                                                 alt="FBM Logo" 
                                                 width={800} 
                                                 height={400} 

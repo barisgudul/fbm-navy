@@ -2,6 +2,8 @@
 import { Metadata } from 'next';
 import { supabase } from '@/app/lib/supabaseClient';
 import PropertyDetailClient from '@/app/components/PropertyDetailClient';
+import Script from 'next/script';
+import { getBreadcrumbSchema } from '@/app/config/seo';
 
 type Props = {
   params: Promise<{ id: string }>
@@ -25,7 +27,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!data) {
     return {
-      title: 'İlan Bulunamadı | FBM Emlak',
+      title: 'İlan Bulunamadı | FBM Gayrimenkul Isparta',
+      description: 'Aradığınız gayrimenkul ilanı bulunamadı. Isparta\'da satılık ve kiralık ev, daire, villa ilanları için FBM Gayrimenkul\'ü ziyaret edin.',
     };
   }
 
@@ -33,25 +36,45 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? data.image_urls[0] 
     : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop';
 
+  const metaDescription = data.description 
+    ? data.description.slice(0, 155) + '...'
+    : `${data.title} - ${data.rooms} oda, ${data.living_rooms} salon, ${data.area}m². ${data.location}, Isparta. FBM Gayrimenkul güvencesiyle.`;
+
   return {
-    // Başlık otomatik olarak: "Isparta Hızırbey... | FBM Emlak & Tasarım" olur
-    title: `${data.title} | FBM Emlak & Tasarım`,
-    // Açıklama emlakçının girdiği metinden alınır
-    description: data.description ? data.description.slice(0, 160) : data.title,
+    title: `${data.title} - Satılık ${data.rooms}+${data.living_rooms} | FBM Gayrimenkul Isparta`,
+    description: metaDescription,
+    keywords: [
+      `Satılık ${data.location}`,
+      `${data.location} Satılık Daire`,
+      `Isparta ${data.location} Emlak`,
+      `${data.rooms}+${data.living_rooms} Satılık`,
+      'Isparta Satılık Ev',
+      'FBM Gayrimenkul'
+    ],
     openGraph: {
-      title: data.title,
-      description: data.description,
+      title: `${data.title} - Satılık`,
+      description: metaDescription,
+      url: `https://www.fbmgayrimenkul.com/satilik/${id}`,
       images: [
         {
           url: imageUrl,
-          width: 800,
-          height: 600,
+          width: 1200,
+          height: 630,
           alt: data.title,
         },
       ],
       type: 'website',
       locale: 'tr_TR',
-      siteName: 'FBM Emlak & Tasarım',
+      siteName: 'FBM Gayrimenkul Isparta',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: data.title,
+      description: metaDescription,
+      images: [imageUrl],
+    },
+    alternates: {
+      canonical: `https://www.fbmgayrimenkul.com/satilik/${id}`,
     },
   };
 }
@@ -94,35 +117,65 @@ export default async function SatilikDetailPage({ params }: Props) {
     videos: data.video_urls || [] 
   };
 
-  // Google için Yapısal Veri (Schema Markup)
+  // Google için Yapısal Veri (Schema Markup) - RealEstateListing
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Product', 
+    '@type': 'Residence', 
     name: data.title,
     image: imagesList,
     description: data.description,
-    brand: {
-      '@type': 'Brand',
-      name: 'FBM Emlak',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: data.location,
+      addressRegion: 'Isparta',
+      addressCountry: 'TR'
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 37.7648,
+      longitude: 30.5566
+    },
+    numberOfRooms: data.rooms + data.living_rooms,
+    floorSize: {
+      '@type': 'QuantitativeValue',
+      value: data.area,
+      unitCode: 'MTK'
     },
     offers: {
       '@type': 'Offer',
       priceCurrency: 'TRY',
       price: parsePrice(data.price),
       availability: data.status === 'aktif' ? 'https://schema.org/InStock' : 'https://schema.org/SoldOut',
-      itemCondition: 'https://schema.org/UsedCondition',
-      areaServed: {
-        '@type': 'Place',
-        name: 'Isparta'
+      url: `https://www.fbmgayrimenkul.com/satilik/${data.id}`,
+      seller: {
+        '@type': 'RealEstateAgent',
+        name: 'FBM Gayrimenkul',
+        url: 'https://www.fbmgayrimenkul.com'
       }
     }
   };
+
+  // Breadcrumb Schema
+  const breadcrumbItems = [
+    { name: 'Ana Sayfa', url: '/' },
+    { name: 'Satılık', url: '/satilik' },
+    { name: data.title, url: `/satilik/${data.id}` }
+  ];
+  const breadcrumbSchema = getBreadcrumbSchema(breadcrumbItems);
 
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <Script
+        id="breadcrumb-schema"
+        type="application/ld+json"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbSchema),
+        }}
       />
       <PropertyDetailClient initialProperty={property} />
     </>

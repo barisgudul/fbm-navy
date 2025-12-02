@@ -4,6 +4,7 @@
 import { PropertyCard } from '@/app/components/PropertyCard';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/app/lib/supabaseClient';
+import { ChevronDown, ChevronUp, Filter } from 'lucide-react';
 
 // Frontend'in beklediği veri tipi
 export interface Property {
@@ -34,6 +35,7 @@ interface DBProperty {
 export default function SatilikPage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filters, setFilters] = useState({
     location: '',
     minPrice: '',
@@ -112,62 +114,87 @@ export default function SatilikPage() {
         </div>
 
         {/* Filtreleme Barı */}
-        <div className="mb-8 bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-6 border border-fbm-gold-400/20">
-          <h2 className="text-lg font-serif text-fbm-gold-400 mb-4">Filtrele</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-xs text-fbm-gold-400/80 mb-1">Konum</label>
-              <input
-                type="text"
-                placeholder="Örn: Merkez"
-                value={filters.location}
-                onChange={(e) => setFilters({ ...filters, location: e.target.value })}
-                className="w-full bg-fbm-navy-900/50 p-2 rounded border border-white/10 text-white placeholder:text-white/30 focus:border-fbm-gold-400 outline-none text-sm"
-              />
+        <div className="mb-8 bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg border border-fbm-gold-400/20">
+          {/* Filtre Başlığı - Açılır Kapanır */}
+          <button
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            className="w-full p-6 flex items-center justify-between hover:bg-fbm-denim-750/70 transition-colors duration-300 rounded-lg"
+          >
+            <div className="flex items-center gap-3">
+              <Filter className="w-5 h-5 text-fbm-gold-400" />
+              <h2 className="text-lg font-serif text-fbm-gold-400">
+                Filtrele
+                {(filters.location || filters.minPrice || filters.maxPrice || filters.rooms) && (
+                  <span className="ml-2 text-sm text-fbm-bronze-400">(Aktif)</span>
+                )}
+              </h2>
             </div>
-            <div>
-              <label className="block text-xs text-fbm-gold-400/80 mb-1">Min Fiyat (₺)</label>
-              <input
-                type="number"
-                placeholder="Örn: 1000000"
-                value={filters.minPrice}
-                onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
-                className="w-full bg-fbm-navy-900/50 p-2 rounded border border-white/10 text-white placeholder:text-white/30 focus:border-fbm-gold-400 outline-none text-sm"
-              />
+            {isFilterOpen ? (
+              <ChevronUp className="w-5 h-5 text-fbm-gold-400" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-fbm-gold-400" />
+            )}
+          </button>
+
+          {/* Filtre İçeriği */}
+          {isFilterOpen && (
+            <div className="px-6 pb-6 border-t border-fbm-gold-400/10 pt-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-xs text-fbm-gold-400/80 mb-1">Konum</label>
+                  <input
+                    type="text"
+                    placeholder="Örn: Merkez"
+                    value={filters.location}
+                    onChange={(e) => setFilters({ ...filters, location: e.target.value })}
+                    className="w-full bg-fbm-navy-900/50 p-2 rounded border border-white/10 text-white placeholder:text-white/30 focus:border-fbm-gold-400 outline-none text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-fbm-gold-400/80 mb-1">Min Fiyat (₺)</label>
+                  <input
+                    type="number"
+                    placeholder="Örn: 1000000"
+                    value={filters.minPrice}
+                    onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
+                    className="w-full bg-fbm-navy-900/50 p-2 rounded border border-white/10 text-white placeholder:text-white/30 focus:border-fbm-gold-400 outline-none text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-fbm-gold-400/80 mb-1">Max Fiyat (₺)</label>
+                  <input
+                    type="number"
+                    placeholder="Örn: 5000000"
+                    value={filters.maxPrice}
+                    onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
+                    className="w-full bg-fbm-navy-900/50 p-2 rounded border border-white/10 text-white placeholder:text-white/30 focus:border-fbm-gold-400 outline-none text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-fbm-gold-400/80 mb-1">Oda Sayısı</label>
+                  <select
+                    value={filters.rooms}
+                    onChange={(e) => setFilters({ ...filters, rooms: e.target.value })}
+                    className="w-full bg-fbm-navy-900/50 p-2 rounded border border-white/10 text-white focus:border-fbm-gold-400 outline-none text-sm"
+                  >
+                    <option value="">Tümü</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5+</option>
+                  </select>
+                </div>
+              </div>
+              {(filters.location || filters.minPrice || filters.maxPrice || filters.rooms) && (
+                <button
+                  onClick={() => setFilters({ location: '', minPrice: '', maxPrice: '', rooms: '' })}
+                  className="mt-4 text-sm text-fbm-gold-400 hover:text-fbm-bronze-400 underline"
+                >
+                  Filtreleri Temizle
+                </button>
+              )}
             </div>
-            <div>
-              <label className="block text-xs text-fbm-gold-400/80 mb-1">Max Fiyat (₺)</label>
-              <input
-                type="number"
-                placeholder="Örn: 5000000"
-                value={filters.maxPrice}
-                onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
-                className="w-full bg-fbm-navy-900/50 p-2 rounded border border-white/10 text-white placeholder:text-white/30 focus:border-fbm-gold-400 outline-none text-sm"
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-fbm-gold-400/80 mb-1">Oda Sayısı</label>
-              <select
-                value={filters.rooms}
-                onChange={(e) => setFilters({ ...filters, rooms: e.target.value })}
-                className="w-full bg-fbm-navy-900/50 p-2 rounded border border-white/10 text-white focus:border-fbm-gold-400 outline-none text-sm"
-              >
-                <option value="">Tümü</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5+</option>
-              </select>
-            </div>
-          </div>
-          {(filters.location || filters.minPrice || filters.maxPrice || filters.rooms) && (
-            <button
-              onClick={() => setFilters({ location: '', minPrice: '', maxPrice: '', rooms: '' })}
-              className="mt-4 text-sm text-fbm-gold-400 hover:text-fbm-bronze-400 underline"
-            >
-              Filtreleri Temizle
-            </button>
           )}
         </div>
 
