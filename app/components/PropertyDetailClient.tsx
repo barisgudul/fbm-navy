@@ -224,7 +224,7 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
               <MapPin className="w-5 h-5 text-fbm-gold-400" /> <span>{property.location}</span>
             </div>
             <div className="bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-6 mb-6 border border-fbm-sage-200/30">
-              <p className="font-serif text-4xl text-fbm-gold-400 font-bold mb-6">{property.price}</p>
+              <p className="font-serif text-4xl text-fbm-gold-400 font-bold mb-6">{property.price} ₺</p>
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center">
                   <Bed className="w-5 h-5 text-fbm-gold-400 mx-auto mb-2" />

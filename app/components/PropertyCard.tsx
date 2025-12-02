@@ -89,7 +89,7 @@ export function PropertyCard({ property, index }: PropertyCardProps) {
         
         <div className="pt-4 border-t border-fbm-sage-200/30">
           <p className="font-serif text-2xl md:text-3xl text-fbm-gold-400 font-bold">
-            {property.price}
+            {property.price} ₺
           </p>
         </div>
       </div>

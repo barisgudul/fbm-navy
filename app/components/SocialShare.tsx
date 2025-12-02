@@ -1,7 +1,7 @@
 /* Social Share Component - SEO için sosyal medya paylaşımları */
 'use client';
 
-import { Share2, Facebook, Twitter, Linkedin, Link2 } from 'lucide-react';
+import { Share2, Facebook, Twitter, Link2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface SocialShareProps {
@@ -11,14 +11,22 @@ interface SocialShareProps {
   image?: string;
 }
 
-export function SocialShare({ title, description, url, image }: SocialShareProps) {
+export function SocialShare({ title, description, url }: SocialShareProps) {
   const [copied, setCopied] = useState(false);
+
+  // WhatsApp için şık mesaj formatı
+  const whatsappMessage = `🏠 *${title}*
+
+📍 ${description}
+
+🔗 Detaylar için: ${url}
+
+_FBM Gayrimenkul ile hayalinizdeki eve ulaşın_`;
 
   const shareLinks = {
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-    twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`,
-    linkedin: `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}&summary=${encodeURIComponent(description)}`,
-    whatsapp: `https://api.whatsapp.com/send?text=${encodeURIComponent(`${title} - ${url}`)}`,
+    twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(`🏠 ${title}`)}`,
+    whatsapp: `https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappMessage)}`,
   };
 
   const copyToClipboard = async () => {
@@ -61,15 +69,6 @@ export function SocialShare({ title, description, url, image }: SocialShareProps
           <Twitter className="w-4 h-4 text-white/60 group-hover:text-sky-500 transition-colors" />
         </button>
 
-        {/* LinkedIn */}
-        <button
-          onClick={() => openShare(shareLinks.linkedin)}
-          className="p-2 rounded-lg bg-fbm-denim-750/50 hover:bg-blue-700/20 border border-white/10 hover:border-blue-600/50 transition-all duration-300 group"
-          aria-label="LinkedIn'de paylaş"
-        >
-          <Linkedin className="w-4 h-4 text-white/60 group-hover:text-blue-600 transition-colors" />
-        </button>
-
         {/* WhatsApp */}
         <button
           onClick={() => openShare(shareLinks.whatsapp)}
@@ -108,7 +107,12 @@ export function SimpleShare({ url, text }: { url: string; text: string }) {
   const [copied, setCopied] = useState(false);
 
   const shareWhatsApp = () => {
-    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(`${text} - ${url}`)}`;
+    const whatsappMessage = `🏠 *${text}*
+
+🔗 ${url}
+
+_FBM Gayrimenkul_`;
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappMessage)}`;
     window.open(whatsappUrl, '_blank');
   };
 
