@@ -5,7 +5,7 @@ import { Inter, Bodoni_Moda } from "next/font/google";
 import "./globals.css";
 import { ClientWrapper } from "@/app/components/ClientWrapper";
 import Script from "next/script";
-import { GoogleAnalytics, GoogleTagManager } from "@/app/components/GoogleAnalytics";
+import { GoogleAnalytics, GoogleTagManagerHead, GoogleTagManagerBody } from "@/app/components/GoogleAnalytics";
 import { seoConfig, getLocalBusinessSchema } from "@/app/config/seo";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -163,6 +163,12 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <head>
+        {/* Google Tag Manager - HEAD'in en üstünde olmalı */}
+        <GoogleTagManagerHead gtmId={seoConfig.analytics.googleTagManagerId} />
+        
+        {/* Google Analytics */}
+        <GoogleAnalytics gaId={seoConfig.analytics.googleAnalyticsId} />
+        
         {/* Structured Data Schemas */}
         <Script
           id="local-business-schema"
@@ -188,12 +194,11 @@ export default function RootLayout({
             __html: JSON.stringify(websiteSchema),
           }}
         />
-        
-        {/* Google Analytics & Tag Manager */}
-        <GoogleAnalytics gaId={seoConfig.analytics.googleAnalyticsId} />
-        <GoogleTagManager gtmId={seoConfig.analytics.googleTagManagerId} />
       </head>
       <body className={`${inter.variable} ${bodoni.variable} text-white bg-fixed`}>
+        {/* Google Tag Manager - BODY'nin hemen başında olmalı */}
+        <GoogleTagManagerBody gtmId={seoConfig.analytics.googleTagManagerId} />
+        
         <ClientWrapper>
           {children}
         </ClientWrapper>

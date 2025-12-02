@@ -69,9 +69,9 @@ export const seoConfig = {
 
   // Google Analytics & Tag Manager
   analytics: {
-    googleAnalyticsId: 'G-XXXXXXXXXX', // Buraya Google Analytics ID'nizi ekleyin
-    googleTagManagerId: 'GTM-XXXXXXX', // Buraya Google Tag Manager ID'nizi ekleyin
-    googleSiteVerification: 'google-site-verification-code', // Google Search Console'dan alın
+    googleAnalyticsId: 'G-9PT35J603B', // Google Analytics aktif ✓
+    googleTagManagerId: 'GTM-WJ2V53MC', // Google Tag Manager aktif ✓
+    googleSiteVerification: 'Ba2C0l0HUrc3WLaxtMxDUJkie5CCIoq-HeJuZhmh3WI', // Google Search Console doğrulandı ✓
   },
 
   // Logo ve Görseller
