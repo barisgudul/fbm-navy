@@ -18,6 +18,11 @@ export const metadata: Metadata = {
     template: "%s | FBM Gayrimenkul Isparta"
   },
   description: seoConfig.defaultDescription,
+  icons: {
+    icon: '/fbm-logo.png',
+    shortcut: '/fbm-logo.png',
+    apple: '/fbm-logo.png',
+  },
   keywords: [
     // Isparta Ana Anahtar Kelimeler
     'Isparta Gayrimenkul',
