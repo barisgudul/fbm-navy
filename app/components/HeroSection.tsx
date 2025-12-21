@@ -39,21 +39,22 @@ export function HeroSection() {
 
   return (
     <section className="w-screen h-screen flex-shrink-0 snap-start relative flex flex-col justify-center items-start text-left p-4">
-      <div 
+      <div
         className="absolute inset-0 z-10 bg-gradient-to-br from-fbm-navy-900/85 via-fbm-denim-750/70 via-fbm-amber-250/60 via-fbm-bronze-400/45 to-fbm-cream-100/35"
       ></div>
-      
-      <video 
-        autoPlay 
-        loop 
-        muted 
-        playsInline 
+
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        poster="/hero-poster.png"
         className="absolute top-0 left-0 w-full h-full object-cover z-0"
       >
         <source src="/hero-video.mp4" type="video/mp4" />
         Tarayıcınız video etiketini desteklemiyor.
       </video>
-      
+
       <div className="relative z-20 container mx-auto px-4 sm:px-6 lg:px-8">
         {/* AnimatePresence, elemanlar değiştiğinde animasyonları yönetir */}
         <AnimatePresence mode="wait">
@@ -75,7 +76,7 @@ export function HeroSection() {
                 {currentNarrative.highlight}
               </span>
             </motion.h1>
-            
+
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

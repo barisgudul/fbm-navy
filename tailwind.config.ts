@@ -43,17 +43,22 @@ const config: Config = {
       },
       animation: {
         'reveal-line': 'reveal-line 1s ease-out forwards',
+        'shimmer': 'shimmer 2s infinite linear',
       },
       keyframes: {
         'reveal-line': {
           '0%': { transform: 'scaleX(0)' },
           '100%': { transform: 'scaleX(1)' },
         },
+        'shimmer': {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
       },
     },
   },
   plugins: [
-    plugin(function({ addBase, matchUtilities, theme }) {
+    plugin(function ({ addBase, matchUtilities, theme }) {
       const fbmColors = theme('colors.fbm');
       const toRGB = (hex: string) => {
         const normalized = hex.replace('#', '');

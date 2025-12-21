@@ -1,105 +1,119 @@
 /* app/satilik/page.tsx */
-'use client';
 
-import { PropertyCard } from '@/app/components/PropertyCard';
-import { useState, useEffect } from 'react';
+import { FilterPanel } from '@/app/components/FilterPanel';
+import { PropertyGrid } from '@/app/components/PropertyGrid';
+import { Pagination } from '@/app/components/Pagination';
 import { supabase } from '@/app/lib/supabaseClient';
-import { ChevronDown, ChevronUp, Filter } from 'lucide-react';
+import { transformToProperty } from '@/types';
+import type { Property, PropertyRow, PaginationInfo } from '@/types';
 
-// Frontend'in beklediği veri tipi
-export interface Property {
-  id: number;
-  title: string;
-  location: string;
-  price: string;
-  area: number;
-  rooms: number;
-  livingRoom: number;
-  bathrooms: number;
-  image: string;
+interface SearchParams {
+  location?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  rooms?: string;
+  page?: string;
 }
 
-// Veritabanından gelen ham veri tipi
-interface DBProperty {
-  id: number;
-  title: string;
-  location: string;
-  price: string;
-  area: number;
-  rooms: number;
-  living_rooms: number;
-  bathrooms: number;
-  image_urls: string[];
-}
+const ITEMS_PER_PAGE = 12;
 
-export default function SatilikPage() {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filters, setFilters] = useState({
-    location: '',
-    minPrice: '',
-    maxPrice: '',
-    rooms: ''
-  });
+export default async function SatilikPage({
+  searchParams
+}: {
+  searchParams: Promise<SearchParams>
+}) {
+  // Await search params (Next.js 15 requirement)
+  const params = await searchParams;
 
-  useEffect(() => {
-    async function fetchProperties() {
-      setLoading(true);
-      // 1. Veritabanından 'satilik' olanları çek
-      let query = supabase
-        .from('properties')
-        .select('*')
-        .eq('type', 'satilik')
-        .eq('status', 'aktif');
+  // Pagination setup
+  const currentPage = Math.max(1, parseInt(params.page || '1'));
+  const from = (currentPage - 1) * ITEMS_PER_PAGE;
+  const to = from + ITEMS_PER_PAGE - 1;
 
-      // Filtreler
-      if (filters.location) {
-        query = query.ilike('location', `%${filters.location}%`);
-      }
-      if (filters.rooms) {
-        query = query.eq('rooms', Number(filters.rooms));
-      }
+  // Build base query for count (without pagination)
+  let countQuery = supabase
+    .from('properties')
+    .select('*', { count: 'exact', head: true })
+    .eq('type', 'satilik')
+    .eq('status', 'aktif');
 
-      query = query.order('created_at', { ascending: false });
-
-      const { data, error } = await query;
-
-      if (error) {
-        console.error('Veri çekme hatası:', error);
-      } else if (data) {
-        // 2. Veritabanı sütunlarını bizim kart bileşenine uydur (Mapping)
-        let formattedData = data.map((item: DBProperty) => ({
-          id: item.id,
-          title: item.title,
-          location: item.location,
-          price: item.price,
-          area: item.area,
-          rooms: item.rooms,
-          livingRoom: item.living_rooms,
-          bathrooms: item.bathrooms,
-          image: (item.image_urls && item.image_urls.length > 0) 
-            ? item.image_urls[0] 
-            : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop'
-        }));
-
-        // Fiyat filtreleme (client-side, çünkü price string formatında)
-        if (filters.minPrice || filters.maxPrice) {
-          formattedData = formattedData.filter(item => {
-            const priceNum = parseInt(item.price.replace(/[^\d]/g, ''));
-            const min = filters.minPrice ? parseInt(filters.minPrice) : 0;
-            const max = filters.maxPrice ? parseInt(filters.maxPrice) : Infinity;
-            return priceNum >= min && priceNum <= max;
-          });
-        }
-
-        setProperties(formattedData);
-      }
-      setLoading(false);
+  // Apply ALL filter conditions to count query
+  if (params.location) {
+    countQuery = countQuery.ilike('location', `%${params.location}%`);
+  }
+  if (params.rooms) {
+    countQuery = countQuery.eq('rooms', Number(params.rooms));
+  }
+  // Server-side price filtering (price column is now integer in DB)
+  if (params.minPrice) {
+    const minPrice = parseInt(params.minPrice);
+    if (!isNaN(minPrice)) {
+      countQuery = countQuery.gte('price', minPrice);
     }
+  }
+  if (params.maxPrice) {
+    const maxPrice = parseInt(params.maxPrice);
+    if (!isNaN(maxPrice)) {
+      countQuery = countQuery.lte('price', maxPrice);
+    }
+  }
 
-    fetchProperties();
-  }, [filters]);
+  const { count: totalCount } = await countQuery;
+
+  // Build paginated data query with ALL filters applied BEFORE pagination
+  let query = supabase
+    .from('properties')
+    .select('*')
+    .eq('type', 'satilik')
+    .eq('status', 'aktif');
+
+  // Apply ALL filter conditions BEFORE .range()
+  if (params.location) {
+    query = query.ilike('location', `%${params.location}%`);
+  }
+  if (params.rooms) {
+    query = query.eq('rooms', Number(params.rooms));
+  }
+  // Server-side price filtering (price column is now integer in DB)
+  if (params.minPrice) {
+    const minPrice = parseInt(params.minPrice);
+    if (!isNaN(minPrice)) {
+      query = query.gte('price', minPrice);
+    }
+  }
+  if (params.maxPrice) {
+    const maxPrice = parseInt(params.maxPrice);
+    if (!isNaN(maxPrice)) {
+      query = query.lte('price', maxPrice);
+    }
+  }
+
+  // Apply ordering and pagination AFTER all filters
+  query = query.order('created_at', { ascending: false }).range(from, to);
+
+  // Execute query
+  const { data, error } = await query;
+
+  let properties: Property[] = [];
+
+  if (error) {
+    console.error('Veri çekme hatası:', error);
+  } else if (data) {
+    // Transform database rows to frontend properties using typed helper
+    // NO client-side filtering needed - all filtering done in Supabase
+    properties = (data as PropertyRow[]).map(transformToProperty);
+  }
+
+  // Calculate pagination info
+  const totalPages = Math.ceil((totalCount || 0) / ITEMS_PER_PAGE);
+  const paginationInfo: PaginationInfo = {
+    currentPage,
+    totalPages,
+    totalCount: totalCount || 0,
+    itemsPerPage: ITEMS_PER_PAGE,
+    hasNextPage: currentPage < totalPages,
+    hasPrevPage: currentPage > 1
+  };
 
   return (
     <main className="min-h-screen pt-36 md:pt-40 pb-20 px-4 sm:px-6 lg:px-8">
@@ -113,111 +127,14 @@ export default function SatilikPage() {
           </p>
         </div>
 
-        {/* Filtreleme Barı */}
-        <div className="mb-8 bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg border border-fbm-gold-400/20">
-          {/* Filtre Başlığı - Açılır Kapanır */}
-          <button
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="w-full p-6 flex items-center justify-between hover:bg-fbm-denim-750/70 transition-colors duration-300 rounded-lg"
-          >
-            <div className="flex items-center gap-3">
-              <Filter className="w-5 h-5 text-fbm-gold-400" />
-              <h2 className="text-lg font-serif text-fbm-gold-400">
-                Filtrele
-                {(filters.location || filters.minPrice || filters.maxPrice || filters.rooms) && (
-                  <span className="ml-2 text-sm text-fbm-bronze-400">(Aktif)</span>
-                )}
-              </h2>
-            </div>
-            {isFilterOpen ? (
-              <ChevronUp className="w-5 h-5 text-fbm-gold-400" />
-            ) : (
-              <ChevronDown className="w-5 h-5 text-fbm-gold-400" />
-            )}
-          </button>
+        {/* Filter Panel - Client Component */}
+        <FilterPanel />
 
-          {/* Filtre İçeriği */}
-          {isFilterOpen && (
-            <div className="px-6 pb-6 border-t border-fbm-gold-400/10 pt-4">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-xs text-fbm-gold-400/80 mb-1">Konum</label>
-                  <input
-                    type="text"
-                    placeholder="Örn: Merkez"
-                    value={filters.location}
-                    onChange={(e) => setFilters({ ...filters, location: e.target.value })}
-                    className="w-full bg-fbm-navy-900/50 p-2 rounded border border-white/10 text-white placeholder:text-white/30 focus:border-fbm-gold-400 outline-none text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-fbm-gold-400/80 mb-1">Min Fiyat (₺)</label>
-                  <input
-                    type="number"
-                    placeholder="Örn: 1000000"
-                    value={filters.minPrice}
-                    onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
-                    className="w-full bg-fbm-navy-900/50 p-2 rounded border border-white/10 text-white placeholder:text-white/30 focus:border-fbm-gold-400 outline-none text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-fbm-gold-400/80 mb-1">Max Fiyat (₺)</label>
-                  <input
-                    type="number"
-                    placeholder="Örn: 5000000"
-                    value={filters.maxPrice}
-                    onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
-                    className="w-full bg-fbm-navy-900/50 p-2 rounded border border-white/10 text-white placeholder:text-white/30 focus:border-fbm-gold-400 outline-none text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-fbm-gold-400/80 mb-1">Oda Sayısı</label>
-                  <select
-                    value={filters.rooms}
-                    onChange={(e) => setFilters({ ...filters, rooms: e.target.value })}
-                    className="w-full bg-fbm-navy-900/50 p-2 rounded border border-white/10 text-white focus:border-fbm-gold-400 outline-none text-sm"
-                  >
-                    <option value="">Tümü</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5+</option>
-                  </select>
-                </div>
-              </div>
-              {(filters.location || filters.minPrice || filters.maxPrice || filters.rooms) && (
-                <button
-                  onClick={() => setFilters({ location: '', minPrice: '', maxPrice: '', rooms: '' })}
-                  className="mt-4 text-sm text-fbm-gold-400 hover:text-fbm-bronze-400 underline"
-                >
-                  Filtreleri Temizle
-                </button>
-              )}
-            </div>
-          )}
-        </div>
+        {/* Property Grid - Server Component */}
+        <PropertyGrid properties={properties} />
 
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-fbm-gold-400"></div>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {properties.map((property, index) => (
-                <PropertyCard key={property.id} property={property} index={index} />
-              ))}
-            </div>
-            
-            {properties.length === 0 && (
-               <div className="text-white/60 text-center py-20 bg-fbm-denim-750/30 rounded-lg border border-white/5 mt-8">
-                 <p className="text-xl font-serif text-fbm-gold-400 mb-2">Henüz İlan Yok</p>
-                 <p>Şu an sistemde aktif satılık ilan bulunmamaktadır.</p>
-               </div>
-            )}
-          </>
-        )}
+        {/* Pagination - Client Component */}
+        <Pagination {...paginationInfo} baseUrl="/satilik" />
       </div>
     </main>
   );

@@ -18,11 +18,6 @@ export const metadata: Metadata = {
     template: "%s | FBM Gayrimenkul Isparta"
   },
   description: seoConfig.defaultDescription,
-  icons: {
-    icon: '/fbm-logo.png',
-    shortcut: '/fbm-logo.png',
-    apple: '/fbm-logo.png',
-  },
   keywords: [
     // Isparta Ana Anahtar Kelimeler
     'Isparta Gayrimenkul',
@@ -43,7 +38,7 @@ export const metadata: Metadata = {
     'Isparta İç Mimarlık',
     'Isparta Mekan Tasarım',
     'Isparta Gayrimenkul Danışmanlığı',
-    
+
     // Burdur Ana Anahtar Kelimeler
     'Burdur Gayrimenkul',
     'Burdur Emlak',
@@ -53,7 +48,7 @@ export const metadata: Metadata = {
     'Burdur Kiralık Ev',
     'Burdur Ev Fiyatları',
     'Burdur Mimarlık',
-    
+
     // Diğer Bölgeler
     'Dinar Emlak',
     'Dinar Satılık Ev',
@@ -67,7 +62,7 @@ export const metadata: Metadata = {
     'Şarkikaraağaç Emlak',
     'Senirkent Emlak',
     'Gelendost Emlak',
-    
+
     // Marka ve Ekip
     'FBM Gayrimenkul',
     'FBM Emlak',
@@ -170,10 +165,10 @@ export default function RootLayout({
       <head>
         {/* Google Tag Manager - HEAD'in en üstünde olmalı */}
         <GoogleTagManagerHead gtmId={seoConfig.analytics.googleTagManagerId} />
-        
+
         {/* Google Analytics */}
         <GoogleAnalytics gaId={seoConfig.analytics.googleAnalyticsId} />
-        
+
         {/* Structured Data Schemas */}
         <Script
           id="local-business-schema"
@@ -203,7 +198,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${bodoni.variable} text-white bg-fixed`}>
         {/* Google Tag Manager - BODY'nin hemen başında olmalı */}
         <GoogleTagManagerBody gtmId={seoConfig.analytics.googleTagManagerId} />
-        
+
         <ClientWrapper>
           {children}
         </ClientWrapper>

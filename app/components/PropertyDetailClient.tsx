@@ -5,10 +5,11 @@ import { useEffect, useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/app/lib/supabaseClient';
 import Image from 'next/image';
-import { Bed, Bath, Square, ArrowLeft, MapPin, X, ChevronLeft, ChevronRight, Maximize2, Send, CheckCircle, Play } from 'lucide-react';
+import { Bed, Bath, Square, ArrowLeft, MapPin, X, ChevronLeft, ChevronRight, Maximize2, Send, CheckCircle, Play, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PropertyCard } from '@/app/components/PropertyCard';
 import { SocialShare } from '@/app/components/SocialShare';
+import { toast, Toaster } from 'sonner';
 
 interface Property {
   id: number;
@@ -93,8 +94,8 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
           rooms: item.rooms,
           livingRoom: item.living_rooms,
           bathrooms: item.bathrooms,
-          image: (item.image_urls && item.image_urls.length > 0) 
-            ? item.image_urls[0] 
+          image: (item.image_urls && item.image_urls.length > 0)
+            ? item.image_urls[0]
             : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop'
         }));
         setRelatedProperties(formatted);
@@ -123,6 +124,7 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
 
   const handleContactSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (formStatus === 'sending') return;
     setFormStatus('sending');
 
     const formData = new FormData(e.currentTarget);
@@ -133,7 +135,7 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
       propertyTitle: property?.title,
       propertyId: property?.id,
       propertyLocation: property?.location,
-      propertyLink: window.location.href,
+      propertyLink: typeof window !== 'undefined' ? window.location.href : '',
     };
 
     try {
@@ -143,18 +145,39 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
         body: JSON.stringify(data),
       });
 
+      const result = await response.json();
+
       if (response.ok) {
         setFormStatus('success');
+        toast.success('Mesajınız başarıyla gönderildi!', {
+          description: 'En kısa sürede size dönüş yapacağız.',
+        });
         setTimeout(() => {
           setIsContactModalOpen(false);
-          setFormStatus('idle'); 
+          setFormStatus('idle');
         }, 2500);
-      } else {
+      } else if (response.status === 429) {
+        // Rate limit exceeded
+        toast.error('Çok fazla istek gönderdiniz', {
+          description: 'Lütfen bir süre bekleyip tekrar deneyin.',
+        });
         setFormStatus('error');
+      } else if (response.status === 400 && result.errors) {
+        // Validation errors
+        const firstError = result.errors[0];
+        toast.error('Form hatası', {
+          description: firstError?.message || 'Lütfen tüm alanları kontrol edin.',
+        });
+        setFormStatus('error');
+      } else {
+        throw new Error(result.message || 'Bir hata oluştu');
       }
     } catch (error) {
-        console.error(error);
-        setFormStatus('error');
+      console.error(error);
+      toast.error('Mesaj gönderilemedi', {
+        description: 'Lütfen daha sonra tekrar deneyin.',
+      });
+      setFormStatus('error');
     }
   };
 
@@ -169,6 +192,7 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
 
   return (
     <main className="min-h-screen pt-36 md:pt-40 pb-20 px-4 sm:px-6 lg:px-8">
+      <Toaster position="top-right" theme="dark" richColors />
       <div className="container mx-auto max-w-6xl">
         <button onClick={() => router.back()} className="mb-8 flex items-center gap-2 text-fbm-gold-400 hover:text-fbm-bronze-400 transition-colors duration-300">
           <ArrowLeft className="w-5 h-5" /> <span>Geri Dön</span>
@@ -177,33 +201,33 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           <div className="relative h-96 lg:h-[500px] rounded-lg overflow-hidden border border-fbm-gold-400/20 group bg-black/20">
             <motion.div key={activeImageIndex} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="relative w-full h-full flex items-center justify-center bg-black">
-              
+
               {/* Video mu Resim mi Kontrolü */}
               {activeMedia?.type === 'video' ? (
-                <video 
-                  src={activeMedia.url} 
-                  controls 
+                <video
+                  src={activeMedia.url}
+                  controls
                   className="w-full h-full object-contain"
-                  // Videoya tıklandığında lightbox açılmasın istiyorsanız onClick'i kaldırın
+                // Videoya tıklandığında lightbox açılmasın istiyorsanız onClick'i kaldırın
                 />
               ) : (
-                <Image 
-                  src={activeMedia?.url || '/fbm-logo.png'} 
-                  alt={property.title} 
-                  fill 
-                  className="object-cover cursor-pointer" 
-                  priority 
-                  onClick={() => openLightbox(activeImageIndex)} 
+                <Image
+                  src={activeMedia?.url || '/fbm-logo.png'}
+                  alt={property.title}
+                  fill
+                  className="object-cover cursor-pointer"
+                  priority
+                  onClick={() => openLightbox(activeImageIndex)}
                 />
               )}
 
             </motion.div>
-            
+
             {/* Video değilse veya video olsa bile lightbox açmak isterseniz bu butonu tutabilirsiniz */}
             {activeMedia?.type !== 'video' && (
-                <button onClick={() => openLightbox(activeImageIndex)} className="absolute top-4 right-4 bg-fbm-navy-900/60 p-2 rounded-full text-fbm-gold-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm z-10 hover:scale-110">
+              <button onClick={() => openLightbox(activeImageIndex)} className="absolute top-4 right-4 bg-fbm-navy-900/60 p-2 rounded-full text-fbm-gold-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm z-10 hover:scale-110">
                 <Maximize2 className="w-5 h-5" />
-                </button>
+              </button>
             )}
 
             {mediaItems.length > 1 && (
@@ -243,9 +267,9 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
                 </div>
               </div>
             </div>
-            <button 
-                onClick={() => setIsContactModalOpen(true)} 
-                className="w-full bg-fbm-gold-400 text-fbm-navy-900 px-8 py-4 rounded-lg font-sans font-bold hover:bg-fbm-bronze-400 transition-all duration-300 shadow-[0_0_20px_rgba(188,150,72,0.3)] hover:shadow-[0_0_30px_rgba(188,150,72,0.6)] hover:-translate-y-1 border border-fbm-gold-400"
+            <button
+              onClick={() => setIsContactModalOpen(true)}
+              className="w-full bg-fbm-gold-400 text-fbm-navy-900 px-8 py-4 rounded-lg font-sans font-bold hover:bg-fbm-bronze-400 transition-all duration-300 shadow-[0_0_20px_rgba(188,150,72,0.3)] hover:shadow-[0_0_30px_rgba(188,150,72,0.6)] hover:-translate-y-1 border border-fbm-gold-400"
             >
               İletişime Geç
             </button>
@@ -254,7 +278,7 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
 
         {/* Sosyal Medya Paylaşım */}
         <div className="mb-8 bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-6 border border-fbm-sage-200/30">
-          <SocialShare 
+          <SocialShare
             title={property.title}
             description={property.description || `${property.title} - ${property.rooms}+${property.livingRoom}, ${property.area}m², ${property.location}`}
             url={typeof window !== 'undefined' ? window.location.href : ''}
@@ -284,28 +308,28 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
             <h2 className="font-serif text-3xl text-fbm-gold-400 mb-6">Galeri ({mediaItems.length})</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {mediaItems.map((item, index) => (
-                <div 
-                  key={index} 
-                  onClick={() => { setActiveImageIndex(index); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
+                <div
+                  key={index}
+                  onClick={() => { setActiveImageIndex(index); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   className={`relative h-32 rounded-lg overflow-hidden cursor-pointer transition-all duration-500 border-2 bg-black/40 group ${index === activeImageIndex ? 'border-white scale-105 shadow-[0_0_20px_rgba(255,255,255,0.5)] opacity-100' : 'border-fbm-sage-200/30 opacity-70 hover:opacity-100 hover:border-white'}`}
                 >
                   {item.type === 'video' ? (
                     <div className="w-full h-full flex items-center justify-center relative">
-                       <video src={item.url} className="w-full h-full object-cover pointer-events-none" />
-                       <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
-                         <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 text-white group-hover:bg-fbm-gold-400 group-hover:text-fbm-navy-900 group-hover:scale-110 transition-all duration-300">
-                           <Play className="w-5 h-5 fill-current" />
-                         </div>
-                       </div>
+                      <video src={item.url} className="w-full h-full object-cover pointer-events-none" />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
+                        <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 text-white group-hover:bg-fbm-gold-400 group-hover:text-fbm-navy-900 group-hover:scale-110 transition-all duration-300">
+                          <Play className="w-5 h-5 fill-current" />
+                        </div>
+                      </div>
                     </div>
                   ) : (
-                  <Image 
-                    src={item.url} 
-                    alt="galeri" 
-                    fill 
-                    className="object-cover"
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                  />
+                    <Image
+                      src={item.url}
+                      alt="galeri"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                    />
                   )}
                 </div>
               ))}
@@ -331,27 +355,27 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-fbm-navy-900/90 flex items-center justify-center backdrop-blur-lg" onClick={() => setIsLightboxOpen(false)}>
             <button onClick={() => setIsLightboxOpen(false)} className="absolute top-6 right-6 text-white/70 hover:text-white z-50 text-3xl p-2"><X /></button>
             <div className="relative w-full h-full max-w-7xl max-h-[90vh] p-4 flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
-              <motion.div 
-                key={activeImageIndex} 
-                initial={{ opacity: 0, scale: 0.95 }} 
-                animate={{ opacity: 1, scale: 1 }} 
+              <motion.div
+                key={activeImageIndex}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
                 className="relative w-full h-full flex items-center justify-center"
               >
                 {mediaItems[activeImageIndex].type === 'video' ? (
-                   <video src={mediaItems[activeImageIndex].url} controls autoPlay className="w-full h-full object-contain max-h-[85vh]" />
+                  <video src={mediaItems[activeImageIndex].url} controls autoPlay className="w-full h-full object-contain max-h-[85vh]" />
                 ) : (
-                   <div className="relative w-full h-full">
-                     <Image 
-                       src={mediaItems[activeImageIndex].url} 
-                       alt="lightbox" 
-                       fill 
-                       className="object-contain" 
-                       sizes="100vw"
-                       quality={90}
-                       priority
-                     />
-                   </div>
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={mediaItems[activeImageIndex].url}
+                      alt="lightbox"
+                      fill
+                      className="object-contain"
+                      sizes="100vw"
+                      quality={90}
+                      priority
+                    />
+                  </div>
                 )}
               </motion.div>
             </div>
@@ -362,7 +386,7 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
               </>
             )}
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 font-sans bg-black/50 px-4 py-1 rounded-full text-sm md:text-base">
-               {activeImageIndex + 1} / {mediaItems.length}
+              {activeImageIndex + 1} / {mediaItems.length}
             </div>
           </motion.div>
         )}
@@ -384,8 +408,8 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
               className="bg-[#1b2838] w-full max-w-lg rounded-xl border border-fbm-gold-400 shadow-2xl shadow-black/50 overflow-hidden relative"
               onClick={(e) => e.stopPropagation()}
             >
-              <button 
-                onClick={() => setIsContactModalOpen(false)} 
+              <button
+                onClick={() => setIsContactModalOpen(false)}
                 className="absolute top-4 right-4 text-fbm-gold-400 hover:text-white transition-colors z-10"
               >
                 <X className="w-6 h-6" />
@@ -393,10 +417,10 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
 
               <div className="p-8 md:p-10">
                 <div className="mb-8">
-                   <h3 className="text-3xl font-serif text-fbm-gold-400 mb-2">İletişime Geç</h3>
-                   <p className="text-sm text-white/60 font-sans">
-                      {property.title}
-                   </p>
+                  <h3 className="text-3xl font-serif text-fbm-gold-400 mb-2">İletişime Geç</h3>
+                  <p className="text-sm text-white/60 font-sans">
+                    {property.title}
+                  </p>
                 </div>
 
                 {formStatus === 'success' ? (
@@ -409,34 +433,34 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
                   <form onSubmit={handleContactSubmit} className="space-y-5 font-sans">
                     <div>
                       <label className="block text-xs text-fbm-gold-400 mb-1 font-bold tracking-wider">ADINIZ SOYADINIZ</label>
-                      <input 
-                        name="name" 
-                        required 
-                        placeholder="Ad Soyad" 
-                        className="w-full bg-[#24364b] p-3 rounded border border-fbm-gold-400/20 focus:border-fbm-gold-400 outline-none text-white placeholder:text-white/20 transition-colors" 
+                      <input
+                        name="name"
+                        required
+                        placeholder="Ad Soyad"
+                        className="w-full bg-[#24364b] p-3 rounded border border-fbm-gold-400/20 focus:border-fbm-gold-400 outline-none text-white placeholder:text-white/20 transition-colors"
                       />
                     </div>
                     <div>
                       <label className="block text-xs text-fbm-gold-400 mb-1 font-bold tracking-wider">TELEFON</label>
-                      <input 
-                        name="phone" 
-                        required 
-                        placeholder="0555 555 55 55" 
-                        className="w-full bg-[#24364b] p-3 rounded border border-fbm-gold-400/20 focus:border-fbm-gold-400 outline-none text-white placeholder:text-white/20 transition-colors" 
+                      <input
+                        name="phone"
+                        required
+                        placeholder="0555 555 55 55"
+                        className="w-full bg-[#24364b] p-3 rounded border border-fbm-gold-400/20 focus:border-fbm-gold-400 outline-none text-white placeholder:text-white/20 transition-colors"
                       />
                     </div>
                     <div>
                       <label className="block text-xs text-fbm-gold-400 mb-1 font-bold tracking-wider">MESAJINIZ</label>
-                      <textarea 
-                        name="note" 
-                        rows={4} 
+                      <textarea
+                        name="note"
+                        rows={4}
                         defaultValue={`Merhaba, "${property.title}" ilanı hakkında detaylı bilgi almak istiyorum.`}
                         className="w-full bg-[#24364b] p-3 rounded border border-fbm-gold-400/20 focus:border-fbm-gold-400 outline-none text-white placeholder:text-white/20 transition-colors resize-none text-sm"
                       ></textarea>
                     </div>
 
-                    <button 
-                      type="submit" 
+                    <button
+                      type="submit"
                       disabled={formStatus === 'sending'}
                       className="w-full bg-fbm-gold-400 text-fbm-navy-900 font-bold py-4 rounded hover:bg-fbm-bronze-400 hover:scale-[1.01] transition-all duration-300 flex items-center justify-center gap-2 shadow-lg mt-6 border border-fbm-gold-400"
                     >
@@ -455,7 +479,7 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
           </motion.div>
         )}
       </AnimatePresence>
-    </main>
+    </main >
   );
 }
 
