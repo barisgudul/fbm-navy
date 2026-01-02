@@ -7,6 +7,7 @@
 'use client';
 
 import { useEffect, useRef, ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import Lenis from 'lenis';
 
 interface SmoothScrollProviderProps {
@@ -15,6 +16,14 @@ interface SmoothScrollProviderProps {
 
 export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
     const lenisRef = useRef<Lenis | null>(null);
+    const pathname = usePathname();
+
+    // Reset scroll on route change
+    useEffect(() => {
+        if (lenisRef.current) {
+            lenisRef.current.scrollTo(0, { immediate: true });
+        }
+    }, [pathname]);
 
     useEffect(() => {
         // Respect reduced motion preference
@@ -25,6 +34,7 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
             duration: 1.2,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             smoothWheel: true,
+            touchMultiplier: 2,
         });
 
         lenisRef.current = lenis;
