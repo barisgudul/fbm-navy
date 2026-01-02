@@ -1,9 +1,20 @@
 /* app/page.tsx */
+/**
+ * Homepage - Natural scroll flow with vitrin section
+ */
 
 import { HeroSection } from "@/app/components/HeroSection";
+import { PropertyGrid } from "@/app/components/PropertyGrid";
+import { supabase } from "@/app/lib/supabaseClient";
+import { transformToProperty } from "@/types";
 import type { Metadata } from "next";
 import Script from "next/script";
+import Link from "next/link";
 import { seoConfig, getFAQSchema } from "@/app/config/seo";
+import { ArrowRight } from "lucide-react";
+import type { PropertyRow } from "@/types";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "FBM Gayrimenkul Isparta & Burdur | Satılık & Kiralık Ev, Daire, Villa, Arsa İlanları",
@@ -12,66 +23,42 @@ export const metadata: Metadata = {
     'Isparta Gayrimenkul',
     'Burdur Gayrimenkul',
     'Isparta Emlak',
-    'Burdur Emlak',
-    'Dinar Emlak',
-    'Keçiborlu Emlak',
     'Satılık Daire Isparta',
-    'Satılık Daire Burdur',
     'Kiralık Ev Isparta',
-    'Kiralık Ev Burdur',
     'Isparta Villa',
-    'Isparta Arsa',
     'FBM Gayrimenkul',
     'Isparta Emlakçı',
-    'Burdur Emlakçı',
-    'Isparta Konut',
-    'Eğirdir Emlak',
-    'Yalvaç Emlak',
-    'Gönen Emlak',
-    'Şarkikaraağaç Emlak'
   ],
   openGraph: {
     title: 'FBM Gayrimenkul Isparta & Burdur | En İyi Emlak İlanları',
-    description: 'Isparta ve Burdur bölgesinde satılık ve kiralık gayrimenkul ilanları. Merkez, Eğirdir, Yalvaç, Burdur, Dinar ve Keçiborlu\'da profesyonel emlak danışmanlığı hizmetleri.',
+    description: 'Isparta ve Burdur bölgesinde satılık ve kiralık gayrimenkul ilanları.',
     url: seoConfig.siteUrl,
     type: 'website',
-    images: [
-      {
-        url: seoConfig.ogImage,
-        width: 1200,
-        height: 630,
-        alt: 'FBM Gayrimenkul Isparta',
-      },
-    ],
+    images: [{ url: seoConfig.ogImage, width: 1200, height: 630, alt: 'FBM Gayrimenkul Isparta' }],
   },
-  alternates: {
-    canonical: seoConfig.siteUrl,
-  },
+  alternates: { canonical: seoConfig.siteUrl },
 };
 
-export default function HomePage() {
-  // FAQ Schema for better SEO
+export default async function HomePage() {
+  // Fetch featured properties
+  const { data } = await supabase
+    .from('properties')
+    .select('*')
+    .eq('status', 'aktif')
+    .order('created_at', { ascending: false })
+    .limit(6);
+
+  const properties = data ? (data as PropertyRow[]).map(transformToProperty) : [];
+
   const faqs = [
     {
       question: "Isparta'da en güvenilir emlak firması hangisi?",
-      answer: "FBM Gayrimenkul, Isparta ve Burdur bölgesinde yıllardır güvenilir emlak danışmanlığı hizmeti vermektedir. Merkez, Eğirdir, Yalvaç, Burdur, Dinar ve Keçiborlu'da geniş portföyümüzle hizmetinizdeyiz."
+      answer: "FBM Gayrimenkul, Isparta ve Burdur bölgesinde yıllardır güvenilir emlak danışmanlığı hizmeti vermektedir."
     },
     {
       question: "FBM Gayrimenkul hangi hizmetleri sunuyor?",
-      answer: "Satılık ve kiralık ev, daire, villa, arsa ilanları ile profesyonel mekan tasarımı ve iç mimarlık hizmetleri sunuyoruz. Gayrimenkul alım-satım, kiralama ve danışmanlık konularında uzmanız."
+      answer: "Satılık ve kiralık ev, daire, villa, arsa ilanları ile profesyonel mekan tasarımı hizmetleri sunuyoruz."
     },
-    {
-      question: "Isparta'da hangi bölgelerde hizmet veriyorsunuz?",
-      answer: "Isparta Merkez, Eğirdir, Yalvaç, Gönen, Şarkikaraağaç, Senirkent, Gelendost ve Uluborlu ile Burdur, Dinar ve Keçiborlu bölgelerinde aktif olarak hizmet vermekteyiz."
-    },
-    {
-      question: "FBM Gayrimenkul'e nasıl ulaşabilirim?",
-      answer: "Telefon: +90 543 591 09 32, E-posta: fbmgayrimenkul.32@gmail.com, WhatsApp ve Instagram (@fbm_gayrimenkul) üzerinden 7/24 bize ulaşabilirsiniz. Ofisimiz: Fatih, 201. Cadde Yener İş Merkezi no:59/61, Isparta."
-    },
-    {
-      question: "Mekan tasarımı hizmeti de veriyor musunuz?",
-      answer: "Evet, profesyonel iç mimarlık ve mekan tasarımı hizmetleri sunuyoruz. Ev, ofis, işyeri ve ticari alanlar için modern ve fonksiyonel tasarımlar gerçekleştiriyoruz."
-    }
   ];
 
   const faqSchema = getFAQSchema(faqs);
@@ -82,12 +69,37 @@ export default function HomePage() {
         id="faq-schema"
         type="application/ld+json"
         strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(faqSchema),
-        }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <main className="w-full h-screen">
+
+      <main className="w-full">
+        {/* Hero Section */}
         <HeroSection />
+
+        {/* Vitrin Section - Target for Keşfet button */}
+        <section id="vitrin" className="py-24 md:py-32 bg-[#12161f]">
+          <div className="container mx-auto px-6 md:px-12 max-w-7xl">
+            {/* Section Header */}
+            <div className="text-center mb-16">
+              <p className="text-fbm-gold-400 text-xs tracking-[0.4em] uppercase mb-4">Öne Çıkan İlanlar</p>
+              <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white">Seçkin Portföyümüz</h2>
+            </div>
+
+            {/* Property Grid */}
+            <PropertyGrid properties={properties} />
+
+            {/* View All Button */}
+            <div className="flex justify-center mt-16">
+              <Link
+                href="/satilik"
+                className="inline-flex items-center gap-3 px-8 py-4 border border-white/20 text-white rounded-lg hover:bg-fbm-gold-400 hover:border-fbm-gold-400 hover:text-fbm-navy-900 transition-all duration-300 group"
+              >
+                <span className="text-sm font-medium tracking-wide">TÜM İLANLARI GÖR</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </div>
+        </section>
       </main>
     </>
   );

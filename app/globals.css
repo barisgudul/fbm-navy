@@ -1,24 +1,135 @@
 /* app/globals.css */
-@import "tailwindcss";
+/**
+ * Premium Design System - Lighter Luxury Theme
+ * Fixed: proper overflow settings for Lenis compatibility
+ */
 
-html, body {
-  overflow-x: hidden;
-  overflow-y: auto;
-  background:
-    radial-gradient(circle at 18% 18%, rgba(205, 170, 102, 0.22), transparent 46%),
-    radial-gradient(circle at 78% 22%, rgba(142, 165, 196, 0.16), transparent 54%),
-    radial-gradient(circle at 36% 82%, rgba(183, 138, 81, 0.16), transparent 52%),
-    linear-gradient(135deg, #1a2534 0%, #233144 28%, #2f3f55 55%, #425369 78%, #233041 100%);
-  background-attachment: fixed;
-  min-height: 100vh;
+@import "tailwindcss";
+@import "lenis/dist/lenis.css";
+
+/* ====================================
+   BASE TYPOGRAPHY
+   ==================================== */
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* Scrollbar'ı tamamen gizle */
+body {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+}
+
+/* Headings - Serif with tight spacing */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-bodoni), Georgia, serif;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* ====================================
+   LIGHTER PREMIUM BACKGROUND
+   ==================================== */
+html,
+body {
+  background: #12161f;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(188, 150, 72, 0.06), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 50%, rgba(60, 80, 110, 0.04), transparent);
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* ====================================
+   SCROLL SETTINGS - Lenis Compatible
+   ==================================== */
+html {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Hide scrollbar but allow scroll */
 ::-webkit-scrollbar {
-  display: none;
+  width: 0;
+  height: 0;
 }
 
 * {
-  -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* ====================================
+   SELECTION & FOCUS
+   ==================================== */
+::selection {
+  background: rgba(188, 150, 72, 0.25);
+  color: white;
+}
+
+:focus-visible {
+  outline: 1px solid rgba(188, 150, 72, 0.4);
+  outline-offset: 3px;
+}
+
+/* ====================================
+   TRANSITIONS
+   ==================================== */
+a,
+button {
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ====================================
+   LUXURY SPACING UTILITIES
+   ==================================== */
+.section-py {
+  padding-top: clamp(5rem, 12vh, 10rem);
+  padding-bottom: clamp(5rem, 12vh, 10rem);
+}
+
+.section-py-lg {
+  padding-top: clamp(7rem, 16vh, 14rem);
+  padding-bottom: clamp(7rem, 16vh, 14rem);
+}
+
+.container-narrow {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .container-narrow {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+/* ====================================
+   SUBTLE BORDERS
+   ==================================== */
+.border-subtle {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.border-hover:hover {
+  border-color: rgba(188, 150, 72, 0.3);
 }

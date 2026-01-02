@@ -24,15 +24,16 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    qualities: [75, 85],
   },
-  
+
   // Sıkıştırma ve performans optimizasyonları
   compress: true,
   poweredByHeader: false,
-  
+
   // Generate sitemap otomatik
   generateEtags: true,
-  
+
   // Sayfa önbellekleme (ISR - Incremental Static Regeneration)
   experimental: {
     optimizeCss: true, // CSS optimizasyonu

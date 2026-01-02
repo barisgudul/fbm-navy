@@ -1,166 +1,150 @@
 /* app/components/layout/Navbar.tsx */
+/**
+ * Premium Navbar - Fixed contact button visibility and hover states
+ */
 
 'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, Phone } from 'lucide-react';
 
 const navLinks = [
-  { href: "/satilik", label: "Satılık" },
-  { href: "/kiralik", label: "Kiralık" },
-  { href: "/mekan-tasarimlari", label: "Mekan Tasarımları" },
-  { href: "/hakkimizda", label: "Hakkımızda" },
-  { href: "/iletisim", label: "İletişim" },
+    { name: 'ANASAYFA', href: '/' },
+    { name: 'SATILIK', href: '/satilik' },
+    { name: 'KİRALIK', href: '/kiralik' },
+    { name: 'PROJELER', href: '/mekan-tasarimlari' },
+    { name: 'KURUMSAL', href: '/hakkimizda' },
+    { name: 'İLETİŞİM', href: '/iletisim' },
 ];
 
 export default function Navbar() {
+    const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const pathname = usePathname();
 
-    const closeMobileMenu = () => {
-        setIsMobileMenuOpen(false);
-    };
+    useEffect(() => {
+        const handleScroll = () => setIsScrolled(window.scrollY > 50);
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
-    const handleLinkClick = () => {
-        closeMobileMenu();
-    };
+    useEffect(() => setIsMobileMenuOpen(false), [pathname]);
 
     return (
         <>
-            <header className="fixed top-0 left-0 right-0 w-full z-50 bg-[linear-gradient(120deg,rgba(20,30,46,0.92)_0%,rgba(37,51,72,0.88)_55%,rgba(54,72,95,0.85)_100%)] backdrop-blur-md border-b border-fbm-gold-400/15">
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5, delay: 0.5 }}
-                    className="container mx-auto px-4 sm:px-6 lg:px-8"
-                >
-                    <div className="flex items-center justify-between h-28 md:h-36">
-                        <Link 
-                            href="/" 
-                            className="flex-shrink-0 z-10 flex items-center gap-2 md:gap-3 group relative h-full pl-2"
-                            onClick={handleLinkClick}
-                        >
-                            <div className="relative h-full w-28 md:w-40 flex items-center justify-center">
-                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-fbm-gold-400/0 group-hover:bg-fbm-gold-400/20 blur-3xl rounded-full transition-all duration-700" />
-                                <Image 
-                                    src="/fbm-logo.png" 
-                                    alt="FBM Logo" 
-                                    width={800} 
-                                    height={400} 
-                                    className="relative z-10 h-full w-auto object-contain transform scale-125 md:scale-150 transition-all duration-500 drop-shadow-xl group-hover:scale-[1.6] group-hover:drop-shadow-[0_0_20px_rgba(188,150,72,0.6)]"
-                                    priority 
-                                    unoptimized
-                                />
-                            </div>
-                            <div className="flex flex-col justify-center border-l border-fbm-gold-400/30 pl-2 md:pl-4 py-1 opacity-80 group-hover:opacity-100 transition-opacity duration-500">
-                                <span className="font-serif text-[10px] md:text-sm tracking-[0.15em] md:tracking-[0.25em] text-fbm-gold-400 leading-tight md:leading-relaxed whitespace-nowrap">GAYRİMENKUL</span>
-                                <span className="font-serif text-[9px] md:text-xs tracking-[0.1em] md:tracking-[0.2em] text-white/90 leading-tight md:leading-relaxed whitespace-nowrap">DEĞERLEME & TASARIM</span>
-                            </div>
-                        </Link>
+            <motion.nav
+                initial={{ y: -100 }}
+                animate={{ y: 0 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
+                    ? 'bg-fbm-navy-900/95 backdrop-blur-md py-3 shadow-lg border-b border-white/5'
+                    : 'bg-transparent py-6'
+                    }`}
+            >
+                <div className="container mx-auto px-4 md:px-8 lg:px-12 flex items-center justify-between">
+                    {/* LOGO */}
+                    <Link href="/" className="relative z-50 flex-shrink-0">
+                        <div className={`relative transition-all duration-500 ${isScrolled ? 'w-20 md:w-24' : 'w-24 md:w-32'}`}>
+                            <Image
+                                src="/fbm-logo.png"
+                                alt="FBM Logo"
+                                width={150}
+                                height={150}
+                                className="object-contain"
+                                priority
+                            />
+                        </div>
+                    </Link>
 
-                        {/* Desktop Navigation */}
-                        <nav className="hidden md:flex items-center space-x-8 lg:space-x-16 ml-auto">
-                            {navLinks.map((link) => (
+                    {/* DESKTOP LINKS */}
+                    <div className="hidden lg:flex items-center gap-8 xl:gap-10">
+                        {navLinks.map((link) => {
+                            const isActive = pathname === link.href;
+                            return (
                                 <Link
-                                    key={link.href}
+                                    key={link.name}
                                     href={link.href}
-                                    className="group font-serif text-xl italic tracking-wider text-white/90 hover:text-fbm-gold-400 relative transition-all duration-500 hover:scale-110"
+                                    className={`relative text-xs font-bold tracking-[0.15em] transition-colors duration-300 ${isActive ? 'text-fbm-gold-400' : 'text-white/80 hover:text-white'
+                                        }`}
                                 >
-                                    <span className="relative z-10 drop-shadow-lg">{link.label}</span>
-                                    <span className="absolute -bottom-2 left-1/2 w-0 h-[2px] bg-gradient-to-r from-transparent via-fbm-gold-400 to-transparent transform -translate-x-1/2 group-hover:w-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(188,150,72,0.8)]" />
-                                    <span className="absolute inset-0 bg-fbm-gold-400/0 group-hover:bg-fbm-gold-400/10 blur-xl transition-all duration-500 rounded-full -z-10" />
+                                    {link.name}
+                                    <span className={`absolute -bottom-2 left-0 h-[1px] bg-fbm-gold-400 transition-all duration-300 ${isActive ? 'w-full' : 'w-0 hover:w-full'
+                                        }`} />
                                 </Link>
-                            ))}
-                        </nav>
+                            );
+                        })}
+                    </div>
 
-                        {/* Mobile Hamburger Menu Button */}
-                        <button
-                            onClick={() => setIsMobileMenuOpen(true)}
-                            className="md:hidden flex items-center justify-center w-10 h-10 text-white hover:text-fbm-gold-400 transition-colors duration-300 z-10"
-                            aria-label="Menüyü Aç"
+                    {/* RIGHT SECTION: Contact + Mobile Toggle */}
+                    <div className="flex items-center gap-3">
+                        {/* Contact Button - Always Visible */}
+                        <a
+                            href="tel:+905435910932"
+                            className="flex items-center gap-2 px-4 py-2 md:px-6 md:py-2.5 rounded-full border text-white transition-all duration-300 border-fbm-gold-400/50 bg-fbm-gold-400/10 hover:bg-fbm-gold-400 hover:text-fbm-navy-900 hover:border-fbm-gold-400"
                         >
-                            <Menu size={28} strokeWidth={1.5} />
+                            <Phone className="w-4 h-4" />
+                            <span className="hidden sm:inline text-xs font-bold tracking-wider">BİZE ULAŞIN</span>
+                        </a>
+
+                        {/* Mobile Menu Toggle */}
+                        <button
+                            className="lg:hidden text-white p-2 z-50"
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            aria-label="Menü"
+                        >
+                            {isMobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
                         </button>
                     </div>
-                </motion.div>
-            </header>
+                </div>
+            </motion.nav>
 
-            {/* Mobile Menu Drawer */}
+            {/* FULL SCREEN MOBILE MENU */}
             <AnimatePresence>
                 {isMobileMenuOpen && (
-                    <>
-                        {/* Overlay */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.3 }}
-                            onClick={closeMobileMenu}
-                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
-                        />
-
-                        {/* Drawer */}
-                        <motion.div
-                            initial={{ x: "-100%" }}
-                            animate={{ x: 0 }}
-                            exit={{ x: "-100%" }}
-                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                            className="fixed left-0 top-0 h-screen w-[80%] max-w-sm bg-gradient-to-b from-fbm-navy-900 via-fbm-denim-750 to-fbm-navy-900 z-[70] shadow-2xl"
-                        >
-                            <div className="flex flex-col h-full">
-                                {/* Drawer Header */}
-                                <div className="flex items-center justify-between p-6 border-b border-white/10">
-                                    <Link 
-                                        href="/" 
-                                        className="flex items-center gap-3 group relative"
-                                        onClick={handleLinkClick}
+                    <motion.div
+                        initial={{ opacity: 0, y: '-100%' }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: '-100%' }}
+                        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                        className="fixed inset-0 z-40 bg-[#12161f]/98 backdrop-blur-xl flex flex-col justify-center items-center"
+                    >
+                        <div className="flex flex-col gap-6 text-center">
+                            {navLinks.map((link, i) => (
+                                <motion.div
+                                    key={link.name}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.1 + i * 0.08 }}
+                                >
+                                    <Link
+                                        href={link.href}
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className={`font-serif text-3xl transition-colors ${pathname === link.href ? 'text-fbm-gold-400' : 'text-white hover:text-fbm-gold-400'
+                                            }`}
                                     >
-                                        <div className="relative h-16 w-32 flex items-center justify-center">
-                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-fbm-gold-400/0 group-hover:bg-fbm-gold-400/20 blur-3xl rounded-full transition-all duration-700" />
-                                            <Image 
-                                                src="/fbm-logo.png" 
-                                                alt="FBM Logo" 
-                                                width={800} 
-                                                height={400} 
-                                                className="relative z-10 h-full w-auto object-contain transform scale-125 transition-all duration-500 drop-shadow-xl group-hover:scale-[1.4] group-hover:drop-shadow-[0_0_20px_rgba(188,150,72,0.6)]"
-                                                priority 
-                                                unoptimized
-                                            />
-                                        </div>
-                                        <div className="flex flex-col justify-center border-l border-fbm-gold-400/30 pl-3 py-1 opacity-80 group-hover:opacity-100 transition-opacity duration-500">
-                                            <span className="font-serif text-xs tracking-[0.2em] text-fbm-gold-400 leading-relaxed whitespace-nowrap">GAYRİMENKUL</span>
-                                            <span className="font-serif text-[10px] tracking-[0.15em] text-white/90 leading-relaxed whitespace-nowrap">DEĞERLEME & TASARIM</span>
-                                        </div>
+                                        {link.name}
                                     </Link>
-                                    <button
-                                        onClick={closeMobileMenu}
-                                        className="flex items-center justify-center w-10 h-10 text-white hover:text-fbm-gold-400 transition-colors duration-300 flex-shrink-0"
-                                        aria-label="Menüyü Kapat"
-                                    >
-                                        <X size={28} strokeWidth={1.5} />
-                                    </button>
-                                </div>
+                                </motion.div>
+                            ))}
+                        </div>
 
-                                {/* Drawer Navigation Links */}
-                                <nav className="flex-1 flex flex-col pt-6">
-                                    {navLinks.map((link) => (
-                                        <Link
-                                            key={link.href}
-                                            href={link.href}
-                                            onClick={handleLinkClick}
-                                            className="group px-6 py-5 font-serif text-xl italic tracking-wider text-white/90 hover:text-fbm-gold-400 relative transition-all duration-500 border-b border-white/10 active:text-fbm-gold-400"
-                                        >
-                                            <span className="relative z-10 drop-shadow-lg">{link.label}</span>
-                                            <span className="absolute left-6 bottom-0 w-0 h-[2px] bg-gradient-to-r from-transparent via-fbm-gold-400 to-transparent group-hover:w-[calc(100%-3rem)] transition-all duration-500 ease-out shadow-[0_0_10px_rgba(188,150,72,0.8)]" />
-                                            <span className="absolute inset-0 bg-fbm-gold-400/0 group-hover:bg-fbm-gold-400/10 blur-xl transition-all duration-500 rounded-full -z-10" />
-                                        </Link>
-                                    ))}
-                                </nav>
-                            </div>
-                        </motion.div>
-                    </>
+                        {/* Mobile Contact */}
+                        <a
+                            href="tel:+905435910932"
+                            className="mt-12 flex items-center gap-3 px-8 py-4 rounded-full bg-fbm-gold-400 text-fbm-navy-900 font-bold"
+                        >
+                            <Phone className="w-5 h-5" />
+                            <span>BİZE ULAŞIN</span>
+                        </a>
+
+                        <div className="absolute bottom-10 text-white/20 text-xs tracking-widest">
+                            FBM GAYRİMENKUL & MİMARLIK
+                        </div>
+                    </motion.div>
                 )}
             </AnimatePresence>
         </>

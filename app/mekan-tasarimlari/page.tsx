@@ -1,12 +1,17 @@
 /* app/mekan-tasarimlari/page.tsx */
+/**
+ * Mekan Tasarımları - Premium Design Portfolio
+ */
 
 'use client';
 
 import { DesignCard } from '@/app/components/DesignCard';
+import { PageHeader } from '@/app/components/layout/PageHeader';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/app/lib/supabaseClient';
+import { motion } from 'framer-motion';
 
-export interface Design {
+interface Design {
   id: number;
   title: string;
   type: string;
@@ -37,9 +42,7 @@ export default function MekanTasarimlariPage() {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Veri çekme hatası:', error);
-      } else if (data) {
+      if (!error && data) {
         const formattedData = data.map((item: DBDesign) => ({
           id: item.id,
           title: item.title,
@@ -47,9 +50,7 @@ export default function MekanTasarimlariPage() {
           location: item.location,
           area: item.area,
           year: item.year,
-          image: (item.image_urls && item.image_urls.length > 0) 
-            ? item.image_urls[0] 
-            : 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop'
+          image: item.image_urls?.[0] || 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800'
         }));
         setDesigns(formattedData);
       }
@@ -60,38 +61,49 @@ export default function MekanTasarimlariPage() {
   }, []);
 
   return (
-    <main className="min-h-screen pt-36 md:pt-40 pb-20 px-4 sm:px-6 lg:px-8">
-      <div className="container mx-auto">
-        <div className="mb-12 text-center">
-          <h1 className="font-serif text-5xl md:text-7xl text-fbm-gold-400 mb-4">
-            Mekan Tasarımları
-          </h1>
-          <p className="font-sans text-lg text-white/80 max-w-2xl mx-auto">
-            Yaratıcı ve fonksiyonel mekan tasarımları. Her proje, estetik ve kullanılabilirliği bir araya getiren özenli çalışmalarımızın ürünüdür.
-          </p>
-        </div>
+    <main className="min-h-screen bg-[#12161f]">
+      {/* Cinematic Header */}
+      <PageHeader
+        title="Mekan Tasarımları"
+        subtitle="Mimari Vizyon"
+        bgImage="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1920&q=80"
+      />
 
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-fbm-gold-400"></div>
-          </div>
-        ) : (
-          <>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {designs.map((design, index) => (
-            <DesignCard key={design.id} design={design} index={index} />
-          ))}
+      {/* Content */}
+      <section className="py-20 md:py-24 px-6 md:px-12">
+        <div className="container mx-auto max-w-7xl">
+
+          {/* Intro */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-3xl mx-auto text-center mb-20"
+          >
+            <p className="text-white/50 text-lg leading-relaxed">
+              Her proje, estetik ve fonksiyonelliği harmanlayan özenli çalışmalarımızın ürünüdür.
+              Modern yaşamın ihtiyaçlarını zarif tasarımlarla buluşturuyoruz.
+            </p>
+          </motion.div>
+
+          {/* Grid */}
+          {loading ? (
+            <div className="flex justify-center py-24">
+              <div className="w-8 h-8 border-2 border-fbm-gold-400/20 border-t-fbm-gold-400 rounded-full animate-spin" />
+            </div>
+          ) : designs.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {designs.map((design, index) => (
+                <DesignCard key={design.id} design={design} index={index} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-24">
+              <p className="text-2xl font-serif text-white/30">Henüz Proje Yok</p>
+            </div>
+          )}
         </div>
-            
-            {designs.length === 0 && (
-              <div className="text-white/60 text-center py-20 bg-fbm-denim-750/30 rounded-lg border border-white/5 mt-8">
-                <p className="text-xl font-serif text-fbm-gold-400 mb-2">Henüz Proje Yok</p>
-                <p>Şu an sistemde aktif proje bulunmamaktadır.</p>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+      </section>
     </main>
   );
 }

@@ -1,4 +1,12 @@
 /* app/components/PropertyCard.tsx */
+/**
+ * Premium Property Card
+ * Following luxury design standards:
+ * - 16:10 aspect ratio for cinematic feel
+ * - Subtle overlay gradient
+ * - No harsh borders, opacity-based edges
+ * - Simple fade-in animation
+ */
 
 'use client';
 
@@ -6,7 +14,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bed, Bath, Square } from 'lucide-react';
+import { Bed, Bath, Maximize, MapPin, ArrowUpRight } from 'lucide-react';
 import type { Property } from '@/types';
 
 interface PropertyCardProps {
@@ -14,93 +22,101 @@ interface PropertyCardProps {
   index: number;
 }
 
-// Generate shimmer placeholder for loading state
-const shimmerDataUrl = `data:image/svg+xml;base64,${Buffer.from(
-  `<svg width="800" height="600" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <defs>
-      <linearGradient id="g">
-        <stop stop-color="#0f172a" offset="20%" />
-        <stop stop-color="#1e293b" offset="50%" />
-        <stop stop-color="#0f172a" offset="70%" />
-      </linearGradient>
-    </defs>
-    <rect width="800" height="600" fill="#0f172a" />
-    <rect id="r" width="800" height="600" fill="url(#g)" />
-    <animate xlink:href="#r" attributeName="x" from="-800" to="800" dur="1s" repeatCount="indefinite"  />
-  </svg>`
-).toString('base64')}`;
-
 export function PropertyCard({ property, index }: PropertyCardProps) {
-  // Satılık mı kiralık mı belirlemek için URL'den kontrol et
   const pathname = usePathname();
   const isRental = pathname.includes('/kiralik');
   const detailPath = isRental ? `/kiralik/${property.id}` : `/satilik/${property.id}`;
 
   return (
-    <Link href={detailPath}>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
+    <Link href={detailPath} className="block group">
+      <motion.article
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: index * 0.1 }}
-        className="group relative overflow-hidden rounded-lg bg-fbm-denim-750/50 backdrop-blur-sm border border-fbm-sage-200/30 hover:border-fbm-cream-100/50 transition-all duration-300 cursor-pointer flex flex-col h-full"
+        transition={{
+          duration: 0.6,
+          delay: index * 0.08, // Staggered delay based on index
+          ease: [0.4, 0, 0.2, 1]
+        }}
+        className="relative overflow-hidden rounded-2xl bg-white/[0.02]"
       >
-        <div className="relative h-64 overflow-hidden rounded-t-lg bg-fbm-denim-750">
+        {/* Image Container - 16:10 Cinematic Ratio */}
+        <div className="relative aspect-[16/10] overflow-hidden">
           {property.image ? (
             <>
               <Image
                 src={property.image}
                 alt={property.title}
                 fill
-                priority={index < 4}
-                placeholder="blur"
-                blurDataURL={shimmerDataUrl}
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                priority={index < 2}
+                loading={index < 2 ? "eager" : "lazy"}
+                quality={75}
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-fbm-navy-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+              {/* Subtle gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+              {/* Status Overlay */}
               {(property.status === 'satildi' || property.status === 'kiralandi') && (
-                <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-20">
-                  <span className="border-4 border-red-500 text-red-500 font-bold text-2xl md:text-4xl px-4 py-2 -rotate-12 uppercase tracking-widest">
-                    {property.status === 'satildi' ? 'SATILDI' : 'KİRALANDI'}
+                <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-[2px]">
+                  <span className="text-white/90 font-medium text-sm uppercase tracking-[0.3em]">
+                    {property.status === 'satildi' ? 'Satıldı' : 'Kiralandı'}
                   </span>
                 </div>
               )}
+
+              {/* Bottom Content Overlay */}
+              <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
+                {/* Location */}
+                <div className="flex items-center gap-1.5 text-white/60 text-xs mb-2">
+                  <MapPin className="w-3 h-3" />
+                  <span className="truncate">{property.location}</span>
+                </div>
+
+                {/* Title */}
+                <h3 className="font-serif text-xl md:text-2xl text-white leading-tight line-clamp-2 mb-3">
+                  {property.title}
+                </h3>
+
+                {/* Specs Row */}
+                <div className="flex items-center gap-4 text-white/50 text-xs">
+                  <span className="flex items-center gap-1">
+                    <Bed className="w-3.5 h-3.5" />
+                    {property.rooms}+{property.livingRoom}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Bath className="w-3.5 h-3.5" />
+                    {property.bathrooms}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Maximize className="w-3.5 h-3.5" />
+                    {property.area} m²
+                  </span>
+                </div>
+              </div>
+
+              {/* Price Badge - Top Right */}
+              <div className="absolute top-4 right-4">
+                <span className="inline-block bg-white/95 text-[#0d1117] font-semibold text-sm px-4 py-2 rounded-lg">
+                  {property.price} ₺
+                </span>
+              </div>
+
+              {/* Hover Arrow */}
+              <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
+                  <ArrowUpRight className="w-5 h-5 text-white" />
+                </div>
+              </div>
             </>
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-fbm-navy-900 via-fbm-denim-750 to-fbm-gold-400 text-fbm-champagne-150/30">
-              <Square className="w-20 h-20" />
+            <div className="w-full h-full flex items-center justify-center bg-[#151b24]">
+              <Maximize className="w-10 h-10 text-white/10" />
             </div>
           )}
         </div>
-
-        <div className="p-6 flex flex-col h-full">
-          <h3 className="font-serif text-xl md:text-2xl text-white mb-2 group-hover:text-fbm-gold-400 transition-colors duration-300 line-clamp-2 min-h-[3.5rem]">
-            {property.title}
-          </h3>
-          <p className="font-sans text-sm text-fbm-champagne-150/80 mb-4 line-clamp-1">{property.location}</p>
-
-          <div className="flex flex-wrap gap-4 mb-4 text-sm text-white/70">
-            <div className="flex items-center gap-2">
-              <Bed className="w-4 h-4 text-fbm-gold-400" />
-              <span>{property.rooms} + {property.livingRoom}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Bath className="w-4 h-4 text-fbm-gold-400" />
-              <span>{property.bathrooms} Banyo</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Square className="w-4 h-4 text-fbm-gold-400" />
-              <span>{property.area} m²</span>
-            </div>
-          </div>
-
-          <div className="pt-4 border-t border-fbm-sage-200/30">
-            <p className="font-serif text-2xl md:text-3xl text-fbm-gold-400 font-bold">
-              {property.price} ₺
-            </p>
-          </div>
-        </div>
-      </motion.div>
+      </motion.article>
     </Link>
   );
 }
