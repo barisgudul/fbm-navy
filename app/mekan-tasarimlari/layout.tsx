@@ -2,15 +2,15 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Mekan Tasarımları ve İç Mimarlık | FBM Gayrimenkul Isparta & Burdur',
-  description: 'Isparta ve Burdur\'da profesyonel mekan tasarımı ve iç mimarlık hizmetleri. Modern ve fonksiyonel tasarımlarla yaşam alanlarınızı dönüştürüyoruz. FBM Gayrimenkul ile hayalinizdeki mekanı yaratın.',
+  title: 'Mekan Tasarımları ve İç Mimarlık | FRH Gayrimenkul ve Tasarım Isparta & Burdur',
+  description: 'Isparta ve Burdur\'da profesyonel mekan tasarımı ve iç mimarlık hizmetleri. Modern ve fonksiyonel tasarımlarla yaşam alanlarınızı dönüştürüyoruz. FRH Gayrimenkul ve Tasarım ile hayalinizdeki mekanı yaratın.',
   keywords: [
     'Isparta Mekan Tasarımı',
     'Burdur Mekan Tasarımı',
     'Isparta İç Mimarlık',
     'Burdur İç Mimarlık',
     'Isparta Mimari Tasarım',
-    'FBM Tasarım',
+    'FT Tasarım',
     'Isparta Dekorasyon',
     'Burdur Dekorasyon',
     'Isparta Mimarlık Ofisi',
@@ -21,16 +21,16 @@ export const metadata: Metadata = {
     'Ev Dekorasyonu Burdur'
   ],
   openGraph: {
-    title: 'Mekan Tasarımları ve İç Mimarlık | FBM Gayrimenkul',
+    title: 'Mekan Tasarımları ve İç Mimarlık | FRH Gayrimenkul ve Tasarım',
     description: 'Yaratıcı ve fonksiyonel mekan tasarımları. Isparta ve Burdur\'da profesyonel iç mimarlık hizmetleri.',
     url: 'https://www.fbmgayrimenkul.com/mekan-tasarimlari',
     type: 'website',
     images: [
       {
-        url: '/fbm-logo.png',
+        url: '/FRH-logo.png',
         width: 1200,
         height: 630,
-        alt: 'FBM Gayrimenkul Mekan Tasarımları',
+        alt: 'FRH Gayrimenkul ve Tasarım Mekan Tasarımları',
       },
     ],
   },

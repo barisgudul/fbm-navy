@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(seoConfig.siteUrl),
   title: {
     default: seoConfig.defaultTitle,
-    template: "%s | FBM Gayrimenkul Isparta"
+    template: "%s | FRH Gayrimenkul ve Tasarım Isparta"
   },
   description: seoConfig.defaultDescription,
   keywords: [
@@ -64,14 +64,13 @@ export const metadata: Metadata = {
     'Gelendost Emlak',
 
     // Marka ve Ekip
-    'FBM Gayrimenkul',
-    'FBM Emlak',
+    'FRH Gayrimenkul ve Tasarım',
+    'FRH Gayrimenkul',
     'Ferah Tabak',
-    'Bolat Çelebi',
   ],
-  authors: [{ name: 'FBM Gayrimenkul' }],
-  creator: 'FBM Gayrimenkul',
-  publisher: 'FBM Gayrimenkul',
+  authors: [{ name: 'FRH Gayrimenkul ve Tasarım' }],
+  creator: 'FRH Gayrimenkul ve Tasarım',
+  publisher: 'FRH Gayrimenkul ve Tasarım',
   robots: {
     index: true,
     follow: true,
@@ -96,7 +95,7 @@ export const metadata: Metadata = {
         url: seoConfig.ogImage,
         width: 1200,
         height: 630,
-        alt: 'FBM Gayrimenkul Isparta - Satılık ve Kiralık Ev İlanları',
+        alt: 'FRH Gayrimenkul ve Tasarım Isparta - Satılık ve Kiralık Ev İlanları',
       },
     ],
     locale: 'tr_TR',
@@ -110,6 +109,17 @@ export const metadata: Metadata = {
   },
   verification: {
     google: seoConfig.analytics.googleSiteVerification,
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '32x32' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
   },
 };
 

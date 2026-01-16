@@ -30,7 +30,7 @@ export default function IletisimPage() {
             İletişim
           </h1>
           <p className="font-sans text-lg md:text-xl text-white/80 text-center max-w-3xl mx-auto leading-relaxed">
-            Bize ulaşmak için aşağıdaki iletişim bilgilerini kullanabilirsiniz. 
+            Bize ulaşmak için aşağıdaki iletişim bilgilerini kullanabilirsiniz.
             Sorularınız ve talepleriniz için bizimle iletişime geçmekten çekinmeyin.
           </p>
         </motion.div>
@@ -74,7 +74,7 @@ export default function IletisimPage() {
                 <h3 className="font-serif text-2xl md:text-3xl text-fbm-gold-400 mb-4">
                   Telefon
                 </h3>
-                <a 
+                <a
                   href="tel:+905435910932"
                   className="text-white/80 hover:text-fbm-gold-400 transition-colors duration-300"
                 >
@@ -99,11 +99,11 @@ export default function IletisimPage() {
                 <h3 className="font-serif text-2xl md:text-3xl text-fbm-gold-400 mb-4">
                   E-posta
                 </h3>
-                <a 
-                  href="mailto:FBMgayrimenkul.32@gmail.com"
+                <a
+                  href="mailto:frhicmimar@gmail.com"
                   className="text-white/80 hover:text-fbm-gold-400 transition-colors duration-300"
                 >
-                  fbmgayrimenkul.32@gmail.com
+                  frhicmimar@gmail.com
                 </a>
               </div>
             </div>
@@ -140,8 +140,8 @@ export default function IletisimPage() {
             transition={{ duration: 0.6, delay: 0.7 }}
             className="bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-8 border border-fbm-sage-200/30 group hover:border-fbm-gold-400 transition-all duration-300 cursor-pointer"
           >
-            <a 
-              href="https://www.instagram.com/fbm_gayrimenkul"
+            <a
+              href="https://www.instagram.com/frhgayrimenkul_tasarim/"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-start gap-4 mb-6"
@@ -157,7 +157,7 @@ export default function IletisimPage() {
                   En güncel portföyümüz ve projelerimiz için bizi Instagram&apos;da takip edin.
                 </p>
                 <span className="text-white/80 group-hover:text-fbm-gold-400 transition-colors duration-300 flex items-center gap-2 font-medium">
-                  @fbm_gayrimenkul
+                  @frhgayrimenkul_tasarim
                   <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
@@ -173,7 +173,7 @@ export default function IletisimPage() {
             transition={{ duration: 0.6, delay: 0.8 }}
             className="bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-8 border border-fbm-sage-200/30 group hover:border-fbm-gold-400 transition-all duration-300 cursor-pointer"
           >
-            <a 
+            <a
               href="https://wa.me/905435910932"
               target="_blank"
               rel="noopener noreferrer"
@@ -234,7 +234,7 @@ export default function IletisimPage() {
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               className="w-full h-full"
-              title="FBM Gayrimenkul - Yener İş Merkezi"
+              title="FRH Gayrimenkul ve Tasarım - Yener İş Merkezi"
             ></iframe>
           </div>
         </motion.div>

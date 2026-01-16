@@ -1,17 +1,17 @@
 /* SEO Configuration */
 
 export const seoConfig = {
-  siteName: 'FBM Gayrimenkul',
+  siteName: 'FRH Gayrimenkul ve Tasarım',
   siteUrl: 'https://www.fbmgayrimenkul.com',
-  defaultTitle: 'FBM Gayrimenkul Isparta | Satılık & Kiralık Ev, Daire, Villa, Arsa',
-  defaultDescription: 'Isparta ve Burdur\'un en güvenilir gayrimenkul danışmanlığı. Merkez, Eğirdir, Yalvaç, Burdur, Dinar ve Keçiborlu\'da satılık ev, kiralık daire, villa, arsa ve profesyonel mimari tasarım hizmetleri.',
-  
+  defaultTitle: 'FRH Gayrimenkul ve Tasarım Isparta | Satılık & Kiralık Ev, Daire, Villa, Arsa',
+  defaultDescription: 'Isparta ve Burdur\'un en güvenilir gayrimenkul danışmanlığı. FRH Gayrimenkul ve Tasarım ile Merkez, Eğirdir, Yalvaç, Burdur, Dinar ve Keçiborlu\'da satılık ev, kiralık daire, villa, arsa ve profesyonel mimari tasarım hizmetleri.',
+
   // İletişim Bilgileri
   contact: {
     phone: '+905435910932',
-    email: 'fbmgayrimenkul.32@gmail.com',
+    email: 'frhicmimar@gmail.com',
     whatsapp: '905435910932',
-    instagram: 'https://www.instagram.com/fbm_gayrimenkul',
+    instagram: 'https://www.instagram.com/frhgayrimenkul_tasarim/',
     address: {
       street: 'Fatih, 201. Cadde Yener İş Merkezi no:59/61',
       city: 'Isparta',
@@ -31,7 +31,7 @@ export const seoConfig = {
   serviceAreas: [
     'Isparta Merkez',
     'Eğirdir',
-    'Yalvaç', 
+    'Yalvaç',
     'Burdur',
     'Dinar',
     'Keçiborlu',
@@ -57,14 +57,14 @@ export const seoConfig = {
     'Burdur Emlak',
     'Isparta Satılık Daire',
     'Isparta Kiralık Ev',
-    'FBM Gayrimenkul',
+    'FRH Gayrimenkul ve Tasarım',
     'Isparta Emlakçı',
     'Isparta Mekan Tasarım'
   ],
 
   // Sosyal Medya
   social: {
-    instagram: 'https://www.instagram.com/fbm_gayrimenkul',
+    instagram: 'https://www.instagram.com/frhgayrimenkul_tasarim/',
   },
 
   // Google Analytics & Tag Manager
@@ -75,8 +75,8 @@ export const seoConfig = {
   },
 
   // Logo ve Görseller
-  logo: '/fbm-logo.png',
-  ogImage: '/fbm-logo.png',
+  logo: '/FRH-logo.png',
+  ogImage: '/FRH-logo.png',
 };
 
 // Yapısal Veri (Schema) Helpers
@@ -85,7 +85,7 @@ export function getLocalBusinessSchema() {
     "@context": "https://schema.org",
     "@type": "RealEstateAgent",
     "name": seoConfig.siteName,
-    "alternateName": "FBM Emlak & Tasarım",
+    "alternateName": "FRH Gayrimenkul & Tasarım",
     "image": `${seoConfig.siteUrl}${seoConfig.logo}`,
     "logo": `${seoConfig.siteUrl}${seoConfig.logo}`,
     "url": seoConfig.siteUrl,

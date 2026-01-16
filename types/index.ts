@@ -1,6 +1,6 @@
 /**
  * Database types for Supabase integration
- * Strictly typed for FBM Gayrimenkul properties table
+ * Strictly typed for FRH Gayrimenkul properties table
  */
 
 // Property status types

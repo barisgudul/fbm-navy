@@ -74,7 +74,7 @@ export default function HakkimizdaPage() {
       {/* Hero Header */}
       <PageHeader
         title="Mükemmelliği İnşa Ediyoruz"
-        subtitle="FBM Gayrimenkul & Tasarım"
+        subtitle="FRH Gayrimenkul ve Tasarım"
         bgImage="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&q=80"
       />
 
@@ -91,7 +91,7 @@ export default function HakkimizdaPage() {
               >
                 <Image
                   src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?q=80&w=2070&auto=format&fit=crop"
-                  alt="FBM Ofis"
+                  alt="FRH Gayrimenkul ve Tasarım Ofis"
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 50vw"
@@ -128,13 +128,13 @@ export default function HakkimizdaPage() {
                 className="space-y-6 text-white/70 text-base md:text-lg leading-relaxed text-justify"
               >
                 <p>
-                  <strong className="text-white">FBM Gayrimenkul</strong>, 2025 yılında Isparta&apos;da kurulmuş olup,
+                  <strong className="text-white">FRH Gayrimenkul ve Tasarım</strong>, 2025 yılında Isparta&apos;da kurulmuş olup,
                   kısa sürede Isparta ve Burdur bölgesinin en vizyoner gayrimenkul firmalarından biri olma yolunda emin adımlarla ilerlemektedir.
                   Merkez, Eğirdir, Yalvaç, Burdur, Dinar ve Keçiborlu başta olmak üzere geniş bir coğrafyada
                   hizmet vermekteyiz.
                 </p>
                 <p>
-                  Kurucularımız <strong className="text-white">Ferah Tabak</strong> ve <strong className="text-white">Bolat Çelebi</strong>&apos;nin
+                  Kurucumuz <strong className="text-white">Ferah Tabak</strong>&apos;ın
                   vizyonuyla şekillenen firmamız, sadece gayrimenkul alım-satım ve kiralama işlemleri değil,
                   aynı zamanda profesyonel mekan tasarımı hizmetleri de sunmaktadır. Her projede estetik ve
                   fonksiyonelliği harmanlayan yaklaşımımız, bizi rakiplerimizden ayırmaktadır.
@@ -216,10 +216,10 @@ export default function HakkimizdaPage() {
             className="text-center mb-16"
           >
             <p className="text-fbm-gold-400 text-xs tracking-[0.3em] uppercase mb-4">Ekibimiz</p>
-            <h2 className="font-serif text-3xl md:text-4xl text-white">Kurucularımız</h2>
+            <h2 className="font-serif text-3xl md:text-4xl text-white">Kurucumuz</h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-8 max-w-2xl mx-auto">
             {/* Ferah Tabak */}
             <div
               className="bg-white/[0.02] rounded-2xl p-8 md:p-10 border border-white/[0.06] hover:border-fbm-gold-400/20 transition-colors duration-500"
@@ -230,34 +230,13 @@ export default function HakkimizdaPage() {
                 </div>
                 <div>
                   <h3 className="font-serif text-xl md:text-2xl text-white">Ferah Tabak</h3>
-                  <p className="text-fbm-gold-400 text-sm tracking-wide">Kurucu Ortak & Tasarımcı</p>
+                  <p className="text-fbm-gold-400 text-sm tracking-wide">Kurucu & Tasarımcı</p>
                 </div>
               </div>
               <p className="text-white/60 leading-relaxed text-justify">
                 Gayrimenkul ve tasarım sektöründeki köklü deneyimiyle, müşterilerine güvenilir ve profesyonel
                 hizmet sunmaktadır. Mekan tasarımı konusundaki uzmanlığı, projelere estetik bir bakış açısı
                 kazandırmaktadır. Detaylara verdiği önem ve müşteri odaklı yaklaşımıyla sektörde fark yaratmaktadır.
-              </p>
-            </div>
-
-            {/* Bolat Çelebi */}
-            <div
-              className="bg-white/[0.02] rounded-2xl p-8 md:p-10 border border-white/[0.06] hover:border-fbm-gold-400/20 transition-colors duration-500"
-            >
-              <div className="flex items-start gap-6 mb-6">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-fbm-gold-400 to-fbm-bronze-400 flex items-center justify-center text-white font-serif text-xl">
-                  BÇ
-                </div>
-                <div>
-                  <h3 className="font-serif text-xl md:text-2xl text-white">Bolat Çelebi</h3>
-                  <p className="text-fbm-gold-400 text-sm tracking-wide">Kurucu Ortak & Emlak Uzmanı</p>
-                </div>
-              </div>
-              <p className="text-white/60 leading-relaxed text-justify">
-                Isparta ve Burdur bölgesindeki gayrimenkul piyasasına derin hakimiyeti ile bilinmektedir.
-                Emlak yatırımları, konut alım-satım ve kiralama konularındaki uzmanlığı, müşterilere en
-                doğru yatırım kararlarını vermelerinde rehberlik etmektedir. Sektördeki geniş ağı ve
-                profesyonel yaklaşımıyla güven veren bir iş ortağıdır.
               </p>
             </div>
           </div>

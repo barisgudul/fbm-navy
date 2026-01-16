@@ -2,29 +2,29 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'İletişim | FBM Gayrimenkul Isparta & Burdur',
-  description: 'FBM Gayrimenkul ile iletişime geçin. Adres: Fatih, 201. Cadde Yener İş Merkezi no:59/61, Isparta. Telefon: +90 543 591 09 32. Isparta ve Burdur bölgesinde gayrimenkul danışmanlığı için bize ulaşın.',
+  title: 'İletişim | FRH Gayrimenkul ve Tasarım Isparta & Burdur',
+  description: 'FRH Gayrimenkul ve Tasarım ile iletişime geçin. Adres: Fatih, 201. Cadde Yener İş Merkezi no:59/61, Isparta. Telefon: +90 543 591 09 32. Isparta ve Burdur bölgesinde gayrimenkul danışmanlığı için bize ulaşın.',
   keywords: [
-    'FBM Gayrimenkul İletişim',
+    'FRH Gayrimenkul ve Tasarım İletişim',
     'Isparta Emlak İletişim',
     'Burdur Emlak İletişim',
-    'FBM Gayrimenkul Telefon',
-    'FBM Gayrimenkul Adres',
+    'FRH Gayrimenkul ve Tasarım Telefon',
+    'FRH Gayrimenkul ve Tasarım Adres',
     'Isparta Emlakçı İletişim',
     'Burdur Emlakçı İletişim',
-    'FBM Emlak Telefon'
+    'FT Emlak Telefon'
   ],
   openGraph: {
-    title: 'İletişim | FBM Gayrimenkul Isparta & Burdur',
-    description: 'Isparta ve Burdur\'da gayrimenkul ihtiyaçlarınız için FBM Gayrimenkul ile iletişime geçin. Profesyonel danışmanlık hizmetleri.',
+    title: 'İletişim | FRH Gayrimenkul ve Tasarım Isparta & Burdur',
+    description: 'Isparta ve Burdur\'da gayrimenkul ihtiyaçlarınız için FRH Gayrimenkul ve Tasarım ile iletişime geçin. Profesyonel danışmanlık hizmetleri.',
     url: 'https://www.fbmgayrimenkul.com/iletisim',
     type: 'website',
     images: [
       {
-        url: '/fbm-logo.png',
+        url: '/FRH-logo.png',
         width: 1200,
         height: 630,
-        alt: 'FBM Gayrimenkul İletişim',
+        alt: 'FRH Gayrimenkul ve Tasarım İletişim',
       },
     ],
   },

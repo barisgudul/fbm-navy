@@ -1,4 +1,4 @@
-# 🎯 FBM Gayrimenkul SEO Talimatları
+# 🎯 FRH Gayrimenkul SEO Talimatları
 
 ## ✅ YAPILAN İYİLEŞTİRMELER
 
@@ -49,7 +49,7 @@ googleSiteVerification: 'BURAYA_KODU_YAPIŞTIRIN',
 ### 2. Google Analytics Kurulumu (ÖNEMLİ!)
 
 **Adım 1:** [Google Analytics](https://analytics.google.com) hesabı oluşturun
-**Adım 2:** Yeni bir özellik (property) oluşturun: "FBM Gayrimenkul"
+**Adım 2:** Yeni bir özellik (property) oluşturun: "FRH Gayrimenkul"
 **Adım 3:** Ölçüm ID'sini alın (örn: G-XXXXXXXXXX)
 **Adım 4:** Bu ID'yi `/app/config/seo.ts` dosyasına ekleyin:
 
@@ -73,7 +73,7 @@ googleTagManagerId: 'GTM-BURAYA_ID_YAPIŞTIRIN',
 
 **Adım 1:** [Google My Business](https://www.google.com/business/) sayfasına gidin
 **Adım 2:** İşletme bilgilerinizi ekleyin:
-- İşletme Adı: FBM Gayrimenkul
+- İşletme Adı: FRH Gayrimenkul
 - Kategori: Emlak Danışmanlığı / Real Estate Agency
 - Adres: Fatih, 201. Cadde Yener İş Merkezi no:59/61, 32200 Merkez/Isparta
 - Telefon: +90 543 591 09 32

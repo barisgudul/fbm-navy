@@ -27,21 +27,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!data) {
     return {
-      title: 'İlan Bulunamadı | FBM Gayrimenkul Isparta',
-      description: 'Aradığınız gayrimenkul ilanı bulunamadı. Isparta\'da satılık ve kiralık ev, daire, villa ilanları için FBM Gayrimenkul\'ü ziyaret edin.',
+      title: 'İlan Bulunamadı | FRH Gayrimenkul ve Tasarım Isparta',
+      description: 'Aradığınız gayrimenkul ilanı bulunamadı. Isparta\'da satılık ve kiralık ev, daire, villa ilanları için FRH Gayrimenkul ve Tasarım\'ı ziyaret edin.',
     };
   }
 
-  const imageUrl = data.image_urls && data.image_urls.length > 0 
-    ? data.image_urls[0] 
+  const imageUrl = data.image_urls && data.image_urls.length > 0
+    ? data.image_urls[0]
     : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop';
 
-  const metaDescription = data.description 
+  const metaDescription = data.description
     ? data.description.slice(0, 155) + '...'
-    : `${data.title} - ${data.rooms} oda, ${data.living_rooms} salon, ${data.area}m². ${data.location}, Isparta. FBM Gayrimenkul güvencesiyle.`;
+    : `${data.title} - ${data.rooms} oda, ${data.living_rooms} salon, ${data.area}m². ${data.location}, Isparta. FRH Gayrimenkul ve Tasarım güvencesiyle.`;
 
   return {
-    title: `${data.title} - Satılık ${data.rooms}+${data.living_rooms} | FBM Gayrimenkul Isparta`,
+    title: `${data.title} - Satılık ${data.rooms}+${data.living_rooms} | FRH Gayrimenkul ve Tasarım Isparta`,
     description: metaDescription,
     keywords: [
       `Satılık ${data.location}`,
@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       `Isparta ${data.location} Emlak`,
       `${data.rooms}+${data.living_rooms} Satılık`,
       'Isparta Satılık Ev',
-      'FBM Gayrimenkul'
+      'FRH Gayrimenkul ve Tasarım'
     ],
     openGraph: {
       title: `${data.title} - Satılık`,
@@ -65,7 +65,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ],
       type: 'website',
       locale: 'tr_TR',
-      siteName: 'FBM Gayrimenkul Isparta',
+      siteName: 'FRH Gayrimenkul ve Tasarım Isparta',
     },
     twitter: {
       card: 'summary_large_image',
@@ -97,8 +97,8 @@ export default async function SatilikDetailPage({ params }: Props) {
   }
 
   // İlan detaylarını ve videoları client bileşenine gönderiyoruz
-  const imagesList = (data.image_urls && data.image_urls.length > 0) 
-    ? data.image_urls 
+  const imagesList = (data.image_urls && data.image_urls.length > 0)
+    ? data.image_urls
     : ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop'];
 
   const property = {
@@ -114,13 +114,13 @@ export default async function SatilikDetailPage({ params }: Props) {
     description: data.description || '',
     images: imagesList,
     type: data.type,
-    videos: data.video_urls || [] 
+    videos: data.video_urls || []
   };
 
   // Google için Yapısal Veri (Schema Markup) - RealEstateListing
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Residence', 
+    '@type': 'Residence',
     name: data.title,
     image: imagesList,
     description: data.description,
@@ -149,7 +149,7 @@ export default async function SatilikDetailPage({ params }: Props) {
       url: `https://www.fbmgayrimenkul.com/satilik/${data.id}`,
       seller: {
         '@type': 'RealEstateAgent',
-        name: 'FBM Gayrimenkul',
+        name: 'FRH Gayrimenkul ve Tasarım',
         url: 'https://www.fbmgayrimenkul.com'
       }
     }

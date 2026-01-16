@@ -17,8 +17,8 @@ import type { PropertyRow } from "@/types";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "FBM Gayrimenkul Isparta & Burdur | Satılık & Kiralık Ev, Daire, Villa, Arsa İlanları",
-  description: "Isparta ve Burdur'un lider gayrimenkul firması FBM Gayrimenkul. Satılık daire, kiralık ev, villa, arsa ilanları ve profesyonel mimari tasarım hizmetleri. Merkez, Eğirdir, Yalvaç, Burdur, Dinar ve Keçiborlu'da güvenilir emlak danışmanlığı.",
+  title: "FRH Gayrimenkul ve Tasarım Isparta & Burdur | Satılık & Kiralık Ev, Daire, Villa, Arsa İlanları",
+  description: "Isparta ve Burdur'un lider gayrimenkul firması FRH Gayrimenkul ve Tasarım. Satılık daire, kiralık ev, villa, arsa ilanları ve profesyonel mimari tasarım hizmetleri. Merkez, Eğirdir, Yalvaç, Burdur, Dinar ve Keçiborlu'da güvenilir emlak danışmanlığı.",
   keywords: [
     'Isparta Gayrimenkul',
     'Burdur Gayrimenkul',
@@ -26,15 +26,15 @@ export const metadata: Metadata = {
     'Satılık Daire Isparta',
     'Kiralık Ev Isparta',
     'Isparta Villa',
-    'FBM Gayrimenkul',
+    'FRH Gayrimenkul ve Tasarım',
     'Isparta Emlakçı',
   ],
   openGraph: {
-    title: 'FBM Gayrimenkul Isparta & Burdur | En İyi Emlak İlanları',
+    title: 'FRH Gayrimenkul ve Tasarım Isparta & Burdur | En İyi Emlak İlanları',
     description: 'Isparta ve Burdur bölgesinde satılık ve kiralık gayrimenkul ilanları.',
     url: seoConfig.siteUrl,
     type: 'website',
-    images: [{ url: seoConfig.ogImage, width: 1200, height: 630, alt: 'FBM Gayrimenkul Isparta' }],
+    images: [{ url: seoConfig.ogImage, width: 1200, height: 630, alt: 'FRH Gayrimenkul ve Tasarım Isparta' }],
   },
   alternates: { canonical: seoConfig.siteUrl },
 };
@@ -53,10 +53,10 @@ export default async function HomePage() {
   const faqs = [
     {
       question: "Isparta'da en güvenilir emlak firması hangisi?",
-      answer: "FBM Gayrimenkul, Isparta ve Burdur bölgesinde yıllardır güvenilir emlak danışmanlığı hizmeti vermektedir."
+      answer: "FRH Gayrimenkul ve Tasarım, Isparta ve Burdur bölgesinde yıllardır güvenilir emlak danışmanlığı hizmeti vermektedir."
     },
     {
-      question: "FBM Gayrimenkul hangi hizmetleri sunuyor?",
+      question: "FRH Gayrimenkul ve Tasarım hangi hizmetleri sunuyor?",
       answer: "Satılık ve kiralık ev, daire, villa, arsa ilanları ile profesyonel mekan tasarımı hizmetleri sunuyoruz."
     },
   ];

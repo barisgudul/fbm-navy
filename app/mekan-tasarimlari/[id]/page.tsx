@@ -19,29 +19,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!data) {
     return {
-      title: 'Proje Bulunamadı | FBM Gayrimenkul & Tasarım',
-      description: 'Aradığınız mekan tasarımı projesi bulunamadı. Isparta\'da profesyonel iç mimarlık ve mekan tasarımı projeleri için FBM Gayrimenkul\'ü ziyaret edin.',
+      title: 'Proje Bulunamadı | FRH Gayrimenkul & Tasarım',
+      description: 'Aradığınız mekan tasarımı projesi bulunamadı. Isparta\'da profesyonel iç mimarlık ve mekan tasarımı projeleri için FRH Gayrimenkul\'ü ziyaret edin.',
     };
   }
 
-  const imageUrl = data.image_urls && data.image_urls.length > 0 
-    ? data.image_urls[0] 
+  const imageUrl = data.image_urls && data.image_urls.length > 0
+    ? data.image_urls[0]
     : 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop';
 
-  const metaDescription = data.description 
+  const metaDescription = data.description
     ? data.description.slice(0, 155) + '...'
-    : `${data.title} - ${data.type} projesi. ${data.area}m² mekan tasarımı, ${data.location}. ${data.year} yılı. FBM Gayrimenkul profesyonel tasarım hizmetleri.`;
+    : `${data.title} - ${data.type} projesi. ${data.area}m² mekan tasarımı, ${data.location}. ${data.year} yılı. FRH Gayrimenkul ve Tasarım profesyonel tasarım hizmetleri.`;
 
   // Tasarımlar için SEO başlığı
   return {
-    title: `${data.title} - ${data.type} Mekan Tasarımı | FBM Gayrimenkul Isparta`,
+    title: `${data.title} - ${data.type} Mekan Tasarımı | FRH Gayrimenkul ve Tasarım Isparta`,
     description: metaDescription,
     keywords: [
       `Isparta ${data.type} Tasarımı`,
       `${data.location} Mekan Tasarımı`,
       'Isparta İç Mimarlık',
       'Isparta Mekan Tasarımı',
-      'FBM Tasarım',
+      'FT Tasarım',
       data.type,
       data.location
     ],
@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ],
       type: 'website',
       locale: 'tr_TR',
-      siteName: 'FBM Gayrimenkul & Tasarım',
+      siteName: 'FRH Gayrimenkul & Tasarım',
     },
     twitter: {
       card: 'summary_large_image',
@@ -90,8 +90,8 @@ export default async function MekanTasarimlariDetailPage({ params }: Props) {
     );
   }
 
-  const imagesList = (data.image_urls && data.image_urls.length > 0) 
-    ? data.image_urls 
+  const imagesList = (data.image_urls && data.image_urls.length > 0)
+    ? data.image_urls
     : ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop'];
 
   const design = {
@@ -128,12 +128,12 @@ export default async function MekanTasarimlariDetailPage({ params }: Props) {
     },
     author: {
       '@type': 'Organization',
-      name: 'FBM Gayrimenkul & Tasarım',
+      name: 'FRH Gayrimenkul & Tasarım',
       url: 'https://www.fbmgayrimenkul.com'
     },
     creator: {
       '@type': 'Organization',
-      name: 'FBM Gayrimenkul',
+      name: 'FRH Gayrimenkul ve Tasarım',
       url: 'https://www.fbmgayrimenkul.com'
     },
     genre: data.type,
@@ -143,7 +143,7 @@ export default async function MekanTasarimlariDetailPage({ params }: Props) {
       serviceType: 'İç Mimarlık ve Mekan Tasarımı',
       provider: {
         '@type': 'RealEstateAgent',
-        name: 'FBM Gayrimenkul'
+        name: 'FRH Gayrimenkul ve Tasarım'
       },
       areaServed: {
         '@type': 'City',
@@ -175,7 +175,7 @@ export default async function MekanTasarimlariDetailPage({ params }: Props) {
           __html: JSON.stringify(breadcrumbSchema),
         }}
       />
-      
+
       <DesignDetailClient initialDesign={design} />
     </>
   );

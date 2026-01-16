@@ -102,7 +102,7 @@ export async function POST(request: Request) {
 
     const mailOptions = {
       from: process.env.GMAIL_USER,
-      to: 'FBMgayrimenkul.32@gmail.com',
+      to: 'frhicmimar@gmail.com',
       subject: `🏠 YENİ MÜŞTERİ: ${propertyTitle || 'Genel Bilgi Talebi'}`,
       html: `
         <div style="font-family: 'Helvetica Neue', Arial, sans-serif; padding: 40px 20px; background-color: #f0f2f5;">
@@ -110,8 +110,8 @@ export async function POST(request: Request) {
             
             <!-- Header -->
             <div style="background-color: #141e2e; padding: 40px 20px; text-align: center; border-bottom: 4px solid #bc9648;">
-               <h1 style="color: #bc9648; margin: 0; font-family: 'Times New Roman', serif; font-size: 32px; letter-spacing: 4px; font-weight: bold;">FBM</h1>
-               <p style="color: #ffffff; margin: 8px 0 0; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; opacity: 0.8;">Gayrimenkul Değerleme & Tasarım</p>
+               <h1 style="color: #bc9648; margin: 0; font-family: 'Times New Roman', serif; font-size: 32px; letter-spacing: 4px; font-weight: bold;">FT</h1>
+               <p style="color: #ffffff; margin: 8px 0 0; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; opacity: 0.8;">Gayrimenkul Tasarım</p>
             </div>
 
             <div style="padding: 40px 30px;">
@@ -167,7 +167,7 @@ export async function POST(request: Request) {
             </div>
             
             <div style="background-color: #141e2e; padding: 20px; text-align: center; color: rgba(255,255,255,0.4); font-size: 12px;">
-              <p style="margin: 0;">&copy; ${new Date().getFullYear()} FBM Emlak & Tasarım</p>
+              <p style="margin: 0;">&copy; ${new Date().getFullYear()} FRH Gayrimenkul ve Tasarım</p>
               <p style="margin: 5px 0 0;">Bu e-posta web sitesi iletişim formundan gönderilmiştir.</p>
             </div>
           </div>

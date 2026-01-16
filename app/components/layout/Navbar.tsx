@@ -50,8 +50,8 @@ export default function Navbar() {
                     <Link href="/" className="relative z-50 flex-shrink-0">
                         <div className={`relative transition-all duration-500 ${isScrolled ? 'w-20 md:w-24' : 'w-24 md:w-32'}`}>
                             <Image
-                                src="/fbm-logo.png"
-                                alt="FBM Logo"
+                                src="/FRH-logo.png"
+                                alt="FRH Logo"
                                 width={150}
                                 height={150}
                                 className="object-contain"
@@ -142,7 +142,7 @@ export default function Navbar() {
                         </a>
 
                         <div className="absolute bottom-10 text-white/20 text-xs tracking-widest">
-                            FBM GAYRİMENKUL & MİMARLIK
+                            FT GAYRİMENKUL TASARIM
                         </div>
                     </motion.div>
                 )}
