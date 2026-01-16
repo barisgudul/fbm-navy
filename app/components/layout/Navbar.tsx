@@ -50,7 +50,7 @@ export default function Navbar() {
                     <Link href="/" className="relative z-50 flex-shrink-0">
                         <div className={`relative transition-all duration-500 ${isScrolled ? 'w-20 md:w-24' : 'w-24 md:w-32'}`}>
                             <Image
-                                src="/FRH-logo.png"
+                                src="/logo.png"
                                 alt="FRH Logo"
                                 width={150}
                                 height={150}

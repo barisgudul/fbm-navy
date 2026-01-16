@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/FRH-logo.png',
+        url: '/logo.png',
         width: 1200,
         height: 630,
         alt: 'Isparta Satılık Daire ve Ev İlanları',

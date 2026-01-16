@@ -75,8 +75,8 @@ export const seoConfig = {
   },
 
   // Logo ve Görseller
-  logo: '/FRH-logo.png',
-  ogImage: '/FRH-logo.png',
+  logo: '/logo.png',
+  ogImage: '/logo.png',
 };
 
 // Yapısal Veri (Schema) Helpers

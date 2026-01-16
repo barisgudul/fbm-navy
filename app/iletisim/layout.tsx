@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/FRH-logo.png',
+        url: '/logo.png',
         width: 1200,
         height: 630,
         alt: 'FRH Gayrimenkul ve Tasarım İletişim',

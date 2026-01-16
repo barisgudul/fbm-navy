@@ -59,7 +59,7 @@ export const Preloader = () => (
       <div className="relative w-64 h-64 md:w-[500px] md:h-[500px] flex items-center justify-center">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-fbm-gold-400/20 blur-[80px] rounded-full animate-pulse" />
         <Image
-          src="/FRH-logo.png"
+          src="/logo.png"
           alt="FRH Gayrimenkul ve Tasarım Logo"
           width={1000}
           height={1000}

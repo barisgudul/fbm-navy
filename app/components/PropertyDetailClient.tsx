@@ -219,7 +219,7 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
                 />
               ) : (
                 <Image
-                  src={activeMedia?.url || '/FRH-logo.png'}
+                  src={activeMedia?.url || '/logo.png'}
                   alt={property.title}
                   fill
                   className="object-cover cursor-pointer"
