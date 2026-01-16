@@ -48,24 +48,29 @@ export async function POST(request: Request) {
 
     // Check rate limit if Upstash is configured
     if (ratelimit) {
-      const { success, limit, remaining, reset } = await ratelimit.limit(ip);
+      try {
+        const { success, limit, remaining, reset } = await ratelimit.limit(ip);
 
-      if (!success) {
-        return NextResponse.json(
-          {
-            success: false,
-            message: 'Çok fazla istek gönderdiniz. Lütfen daha sonra tekrar deneyin.',
-            resetAt: new Date(reset).toISOString()
-          },
-          {
-            status: 429,
-            headers: {
-              'X-RateLimit-Limit': limit.toString(),
-              'X-RateLimit-Remaining': remaining.toString(),
-              'X-RateLimit-Reset': reset.toString(),
+        if (!success) {
+          return NextResponse.json(
+            {
+              success: false,
+              message: 'Çok fazla istek gönderdiniz. Lütfen daha sonra tekrar deneyin.',
+              resetAt: new Date(reset).toISOString()
+            },
+            {
+              status: 429,
+              headers: {
+                'X-RateLimit-Limit': limit.toString(),
+                'X-RateLimit-Remaining': remaining.toString(),
+                'X-RateLimit-Reset': reset.toString(),
+              }
             }
-          }
-        );
+          );
+        }
+      } catch (rateLimitError) {
+        console.warn('Rate limit kontrolü yapılamadı (Upstash hatası), işleme devam ediliyor:', rateLimitError);
+        // Fail open: Redis hatası varsa kullanıcıyı engelleme, devam et.
       }
     }
 
@@ -99,6 +104,17 @@ export async function POST(request: Request) {
         pass: process.env.GMAIL_PASS,
       },
     });
+    // Verify connection configuration
+    try {
+      await transporter.verify();
+      console.log('Nodemailer connection verified');
+    } catch (verifyError) {
+      console.error('Nodemailer connection failed:', verifyError);
+      return NextResponse.json(
+        { success: false, message: 'Mail sunucusu bağlantı hatası. Lütfen daha sonra deneyin.' },
+        { status: 500 }
+      );
+    }
 
     const mailOptions = {
       from: process.env.GMAIL_USER,
@@ -110,8 +126,8 @@ export async function POST(request: Request) {
             
             <!-- Header -->
             <div style="background-color: #141e2e; padding: 40px 20px; text-align: center; border-bottom: 4px solid #bc9648;">
-               <h1 style="color: #bc9648; margin: 0; font-family: 'Times New Roman', serif; font-size: 32px; letter-spacing: 4px; font-weight: bold;">FT</h1>
-               <p style="color: #ffffff; margin: 8px 0 0; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; opacity: 0.8;">Gayrimenkul Tasarım</p>
+               <h1 style="color: #bc9648; margin: 0; font-family: 'Times New Roman', serif; font-size: 32px; letter-spacing: 4px; font-weight: bold;">FRH</h1>
+               <p style="color: #ffffff; margin: 8px 0 0; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; opacity: 0.8;">Gayrimenkul ve Tasarım</p>
             </div>
 
             <div style="padding: 40px 30px;">

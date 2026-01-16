@@ -146,7 +146,13 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
         body: JSON.stringify(data),
       });
 
-      const result = await response.json();
+      let result;
+      try {
+        result = await response.json();
+      } catch (jsonError) {
+        console.error('JSON Parse Error:', jsonError);
+        throw new Error('Sunucu yanıtı okunamadı.');
+      }
 
       if (response.ok) {
         setFormStatus('success');
@@ -173,10 +179,10 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
       } else {
         throw new Error(result.message || 'Bir hata oluştu');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       toast.error('Mesaj gönderilemedi', {
-        description: 'Lütfen daha sonra tekrar deneyin.',
+        description: error.message || 'Lütfen daha sonra tekrar deneyin.',
       });
       setFormStatus('error');
     }
@@ -429,10 +435,20 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
                   </div>
 
                   {formStatus === 'success' ? (
-                    <div className="text-center py-8 animate-reveal-line">
-                      <CheckCircle className="w-16 h-16 text-fbm-gold-400 mx-auto mb-4 drop-shadow-lg" />
-                      <h4 className="text-xl text-white font-bold mb-2">Talebiniz Alındı</h4>
-                      <p className="text-white/60">En kısa sürede size dönüş yapacağız.</p>
+                    <div className="text-center py-10 flex flex-col items-center justify-center h-full animate-in fade-in zoom-in duration-500">
+                      <div className="w-20 h-20 bg-fbm-gold-400/10 rounded-full flex items-center justify-center mb-6 border border-fbm-gold-400/30 shadow-[0_0_30px_rgba(188,150,72,0.2)]">
+                        <CheckCircle className="w-10 h-10 text-fbm-gold-400" />
+                      </div>
+                      <h4 className="text-3xl font-serif text-white mb-3 tracking-wide">Talebiniz Bize Ulaştı</h4>
+                      <p className="text-white/60 mb-8 max-w-xs mx-auto leading-relaxed font-sans">
+                        İlginiz için teşekkür ederiz. Danışmanlarımız en kısa sürede sizinle iletişime geçecektir.
+                      </p>
+                      <button
+                        onClick={() => setIsContactModalOpen(false)}
+                        className="px-8 py-3 bg-fbm-navy-900 border border-fbm-gold-400 text-fbm-gold-400 hover:bg-fbm-gold-400 hover:text-fbm-navy-900 transition-all duration-300 rounded text-sm font-bold tracking-wider uppercase"
+                      >
+                        Tamam
+                      </button>
                     </div>
                   ) : (
                     <form onSubmit={handleContactSubmit} className="space-y-5 font-sans">
