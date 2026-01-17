@@ -8,7 +8,7 @@
 import { DesignCard } from '@/app/components/DesignCard';
 import { PageHeader } from '@/app/components/layout/PageHeader';
 import { FilterTabs } from '@/app/components/FilterTabs';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { supabase } from '@/app/lib/supabaseClient';
 import { DESIGN_FILTER_OPTIONS, type DesignFilterOption } from '@/app/lib/constants';
@@ -34,7 +34,7 @@ interface DBDesign {
   image_urls: string[];
 }
 
-export default function MekanTasarimlariPage() {
+function MekanTasarimlariContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -100,7 +100,7 @@ export default function MekanTasarimlariPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#12161f]">
+    <>
       {/* Cinematic Header */}
       <PageHeader
         title="Mekan Tasarımları"
@@ -152,6 +152,37 @@ export default function MekanTasarimlariPage() {
           )}
         </div>
       </section>
+    </>
+  );
+}
+
+// Loading fallback for Suspense
+function LoadingFallback() {
+  return (
+    <>
+      <PageHeader
+        title="Mekan Tasarımları"
+        subtitle="Mimari Vizyon"
+        bgImage="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1920&q=80"
+      />
+      <section className="py-20 md:py-24 px-6 md:px-12">
+        <div className="container mx-auto max-w-7xl">
+          <div className="flex justify-center py-24">
+            <div className="w-8 h-8 border-2 border-fbm-gold-400/20 border-t-fbm-gold-400 rounded-full animate-spin" />
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+export default function MekanTasarimlariPage() {
+  return (
+    <main className="min-h-screen bg-[#12161f]">
+      <Suspense fallback={<LoadingFallback />}>
+        <MekanTasarimlariContent />
+      </Suspense>
     </main>
   );
 }
+
