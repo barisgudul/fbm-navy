@@ -104,7 +104,8 @@ export default async function MekanTasarimlariDetailPage({ params }: Props) {
     image: imagesList[0],
     description: data.description,
     images: imagesList,
-    videos: data.video_urls || []
+    videos: data.video_urls || [],
+    specs: data.specs || null
   };
 
   // --- GOOGLE İÇİN GİZLİ YAPISAL VERİ (JSON-LD) ---

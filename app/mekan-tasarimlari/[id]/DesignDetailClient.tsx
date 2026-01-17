@@ -4,8 +4,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Square, ArrowLeft, MapPin, Calendar, Play } from 'lucide-react';
+import { Square, ArrowLeft, MapPin, Calendar, Play, Ruler, Droplets, Leaf, Home, Building2 } from 'lucide-react';
 import { SocialShare } from '@/app/components/SocialShare';
+import { SPEC_LABEL_MAP, formatSpecValue, type DesignSpecs } from '@/app/lib/constants';
 
 interface Design {
   id: number;
@@ -18,6 +19,66 @@ interface Design {
   description?: string;
   images?: string[];
   videos?: string[];
+  specs?: DesignSpecs | null;
+}
+
+// TechnicalSpecs Component - Renders specs with Turkish labels and units
+function TechnicalSpecs({ specs, type }: { specs: DesignSpecs | null | undefined; type: string }) {
+  if (!specs || Object.keys(specs).length === 0) return null;
+
+  // Get icon and color based on category
+  const getCategoryStyle = () => {
+    if (specs.category === 'Havuz Tasarımı') {
+      return { icon: <Droplets className="w-5 h-5" />, color: 'text-blue-400', border: 'border-blue-500/30' };
+    }
+    if (specs.category === 'Peyzaj & Bahçe') {
+      return { icon: <Leaf className="w-5 h-5" />, color: 'text-green-400', border: 'border-green-500/30' };
+    }
+    if (specs.category === 'Cephe Tasarımı') {
+      return { icon: <Building2 className="w-5 h-5" />, color: 'text-purple-400', border: 'border-purple-500/30' };
+    }
+    // Interior categories
+    return { icon: <Home className="w-5 h-5" />, color: 'text-amber-400', border: 'border-amber-500/30' };
+  };
+
+  const style = getCategoryStyle();
+
+  // Filter out the 'category' key and only show actual spec values
+  const specEntries = Object.entries(specs).filter(([key, value]) => {
+    if (key === 'category') return false;
+    if (value === undefined || value === null || value === '') return false;
+    return SPEC_LABEL_MAP[key] !== undefined;
+  });
+
+  if (specEntries.length === 0) return null;
+
+  return (
+    <div className={`bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-8 border ${style.border}`}>
+      <h2 className={`font-serif text-3xl ${style.color} mb-6 flex items-center gap-3`}>
+        {style.icon}
+        Teknik Özellikler
+      </h2>
+      <div className="grid grid-cols-2 gap-4">
+        {specEntries.map(([key, value]) => {
+          const config = SPEC_LABEL_MAP[key];
+          if (!config) return null;
+
+          const formattedValue = formatSpecValue(key, value);
+          if (!formattedValue) return null;
+
+          return (
+            <div
+              key={key}
+              className="flex justify-between items-center pb-3 border-b border-fbm-sage-200/20"
+            >
+              <span className="text-white/60">{config.label}:</span>
+              <span className="text-white font-semibold">{formattedValue}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 export default function DesignDetailClient({ initialDesign }: { initialDesign: Design }) {
@@ -29,7 +90,7 @@ export default function DesignDetailClient({ initialDesign }: { initialDesign: D
     ...(initialDesign?.images || []).map(url => ({ type: 'image', url })),
     ...(initialDesign?.videos || []).map(url => ({ type: 'video', url }))
   ];
-  
+
   const activeMedia = mediaItems[activeImageIndex] || (initialDesign?.image ? { type: 'image', url: initialDesign.image } : null);
 
   if (!initialDesign) {
@@ -58,9 +119,9 @@ export default function DesignDetailClient({ initialDesign }: { initialDesign: D
           <div className="relative h-96 lg:h-[500px] rounded-lg overflow-hidden bg-black flex items-center justify-center">
             {activeMedia ? (
               activeMedia.type === 'video' ? (
-                <video 
-                  src={activeMedia.url} 
-                  controls 
+                <video
+                  src={activeMedia.url}
+                  controls
                   className="w-full h-full object-contain"
                 />
               ) : (
@@ -120,7 +181,7 @@ export default function DesignDetailClient({ initialDesign }: { initialDesign: D
 
         {/* Sosyal Medya Paylaşım */}
         <div className="mb-8 bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-6 border border-fbm-sage-200/30">
-          <SocialShare 
+          <SocialShare
             title={initialDesign.title}
             description={initialDesign.description || `${initialDesign.title} - ${initialDesign.type} mekan tasarımı projesi, ${initialDesign.location}`}
             url={typeof window !== 'undefined' ? window.location.href : ''}
@@ -155,18 +216,23 @@ export default function DesignDetailClient({ initialDesign }: { initialDesign: D
             </div>
           </div>
 
-          <div className="bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-8 border border-fbm-sage-200/30">
-            <h2 className="font-serif text-3xl text-fbm-gold-400 mb-6">Tasarım Özellikleri</h2>
-            <div className="space-y-4">
-              <div className="space-y-3 text-sm text-white/80">
-                <p>• Modern ve fonksiyonel tasarım anlayışı</p>
-                <p>• Yüksek kaliteli malzeme kullanımı</p>
-                <p>• Estetik ve kullanılabilirlik odaklı yaklaşım</p>
-                <p>• Özel tasarım detayları</p>
-                <p>• Sürdürülebilir tasarım prensipleri</p>
+          {/* Technical Specs - Conditionally rendered based on specs existence */}
+          {initialDesign.specs ? (
+            <TechnicalSpecs specs={initialDesign.specs} type={initialDesign.type} />
+          ) : (
+            <div className="bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-8 border border-fbm-sage-200/30">
+              <h2 className="font-serif text-3xl text-fbm-gold-400 mb-6">Tasarım Özellikleri</h2>
+              <div className="space-y-4">
+                <div className="space-y-3 text-sm text-white/80">
+                  <p>• Modern ve fonksiyonel tasarım anlayışı</p>
+                  <p>• Yüksek kaliteli malzeme kullanımı</p>
+                  <p>• Estetik ve kullanılabilirlik odaklı yaklaşım</p>
+                  <p>• Özel tasarım detayları</p>
+                  <p>• Sürdürülebilir tasarım prensipleri</p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="bg-fbm-denim-750/50 backdrop-blur-sm rounded-lg p-8 border border-fbm-sage-200/30 mt-8">
@@ -181,19 +247,19 @@ export default function DesignDetailClient({ initialDesign }: { initialDesign: D
             <h2 className="font-serif text-3xl text-fbm-gold-400 mb-6">Galeri ({mediaItems.length})</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {mediaItems.map((item, index) => (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   onClick={() => { setActiveImageIndex(index); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   className={`relative h-32 rounded-lg overflow-hidden cursor-pointer transition-all duration-500 border-2 bg-black/40 group ${index === activeImageIndex ? 'border-white scale-105 shadow-[0_0_20px_rgba(255,255,255,0.5)] opacity-100' : 'border-fbm-sage-200/30 opacity-70 hover:opacity-100 hover:border-white hover:scale-[1.02]'}`}
                 >
                   {item.type === 'video' ? (
                     <div className="w-full h-full flex items-center justify-center relative">
-                       <video src={item.url} className="w-full h-full object-cover pointer-events-none" />
-                       <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
-                         <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 text-white group-hover:bg-fbm-gold-400 group-hover:text-fbm-navy-900 group-hover:scale-110 transition-all duration-300">
-                           <Play className="w-5 h-5 fill-current" />
-                         </div>
-                       </div>
+                      <video src={item.url} className="w-full h-full object-cover pointer-events-none" />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
+                        <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 text-white group-hover:bg-fbm-gold-400 group-hover:text-fbm-navy-900 group-hover:scale-110 transition-all duration-300">
+                          <Play className="w-5 h-5 fill-current" />
+                        </div>
+                      </div>
                     </div>
                   ) : (
                     <Image
@@ -213,4 +279,5 @@ export default function DesignDetailClient({ initialDesign }: { initialDesign: D
     </main>
   );
 }
+
 

@@ -1,14 +1,17 @@
 /* app/mekan-tasarimlari/page.tsx */
 /**
- * Mekan Tasarımları - Premium Design Portfolio
+ * Mekan Tasarımları - Premium Design Portfolio with Filtering
  */
 
 'use client';
 
 import { DesignCard } from '@/app/components/DesignCard';
 import { PageHeader } from '@/app/components/layout/PageHeader';
-import { useState, useEffect } from 'react';
+import { FilterTabs } from '@/app/components/FilterTabs';
+import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { supabase } from '@/app/lib/supabaseClient';
+import { DESIGN_FILTER_OPTIONS, type DesignFilterOption } from '@/app/lib/constants';
 import { motion } from 'framer-motion';
 
 interface Design {
@@ -32,9 +35,20 @@ interface DBDesign {
 }
 
 export default function MekanTasarimlariPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [designs, setDesigns] = useState<Design[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Get category from URL, validate and default to 'Tümü'
+  const categoryParam = searchParams.get('kategori') || 'Tümü';
+  const isValidCategory = (DESIGN_FILTER_OPTIONS as readonly string[]).includes(categoryParam);
+  const activeCategory: DesignFilterOption = isValidCategory
+    ? (categoryParam as DesignFilterOption)
+    : 'Tümü';
+
+  // Fetch all designs once
   useEffect(() => {
     async function fetchDesigns() {
       const { data, error } = await supabase
@@ -60,6 +74,31 @@ export default function MekanTasarimlariPage() {
     fetchDesigns();
   }, []);
 
+  // Filter designs based on active category
+  const filteredDesigns = useMemo(() => {
+    if (activeCategory === 'Tümü') {
+      return designs;
+    }
+    return designs.filter((design) => design.type === activeCategory);
+  }, [designs, activeCategory]);
+
+  // Handle category selection with URL update
+  const handleCategorySelect = (category: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (category === 'Tümü') {
+      params.delete('kategori');
+    } else {
+      params.set('kategori', category);
+    }
+
+    const newUrl = params.toString()
+      ? `/mekan-tasarimlari?${params.toString()}`
+      : '/mekan-tasarimlari';
+
+    router.push(newUrl, { scroll: false });
+  };
+
   return (
     <main className="min-h-screen bg-[#12161f]">
       {/* Cinematic Header */}
@@ -78,7 +117,7 @@ export default function MekanTasarimlariPage() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="max-w-3xl mx-auto text-center mb-20"
+            className="max-w-3xl mx-auto text-center mb-12"
           >
             <p className="text-white/50 text-lg leading-relaxed">
               Her proje, estetik ve fonksiyonelliği harmanlayan özenli çalışmalarımızın ürünüdür.
@@ -86,20 +125,29 @@ export default function MekanTasarimlariPage() {
             </p>
           </motion.div>
 
+          {/* Filter Tabs */}
+          <FilterTabs
+            categories={DESIGN_FILTER_OPTIONS}
+            activeCategory={activeCategory}
+            onSelect={handleCategorySelect}
+          />
+
           {/* Grid */}
           {loading ? (
             <div className="flex justify-center py-24">
               <div className="w-8 h-8 border-2 border-fbm-gold-400/20 border-t-fbm-gold-400 rounded-full animate-spin" />
             </div>
-          ) : designs.length > 0 ? (
+          ) : filteredDesigns.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {designs.map((design, index) => (
+              {filteredDesigns.map((design, index) => (
                 <DesignCard key={design.id} design={design} index={index} />
               ))}
             </div>
           ) : (
             <div className="text-center py-24">
-              <p className="text-2xl font-serif text-white/30">Henüz Proje Yok</p>
+              <p className="text-2xl font-serif text-white/30">
+                {activeCategory === 'Tümü' ? 'Henüz Proje Yok' : `"${activeCategory}" kategorisinde proje bulunamadı`}
+              </p>
             </div>
           )}
         </div>
