@@ -37,7 +37,15 @@ export const LEGACY_CATEGORY_MAP: Record<string, DesignCategory> = {
 // ============================================================
 
 /** Pool system types */
-export const POOL_SYSTEM_TYPES = ['Taşmalı', 'Skimmer'] as const;
+export const POOL_SYSTEM_TYPES = [
+    'Taşmalı',
+    'Skimmer',
+    'Infinity',
+    'Fıskiye Sistemi',
+    'Şelale Sistemi',
+    'Süs Havuzu',
+    'Biyolojik/Doğal'
+] as const;
 export type PoolSystemType = typeof POOL_SYSTEM_TYPES[number];
 
 /** Budget segment types for interior projects */
