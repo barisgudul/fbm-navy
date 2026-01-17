@@ -15,6 +15,11 @@ import {
 } from '@/app/lib/constants';
 
 // Partial spec state for form
+// Unified Image Type
+type ImageItem =
+  | { type: 'existing'; id: string; url: string }
+  | { type: 'new'; id: string; file: File; previewUrl: string };
+
 type PartialSpecs = Omit<DesignSpecs, 'category'> | Record<string, unknown>;
 
 export default function EditDesignPage() {
@@ -35,9 +40,11 @@ export default function EditDesignPage() {
 
   const [specs, setSpecs] = useState<PartialSpecs>({});
 
-  const [existingImages, setExistingImages] = useState<string[]>([]);
-  const [newFiles, setNewFiles] = useState<File[]>([]);
-  const [newPreviews, setNewPreviews] = useState<string[]>([]);
+
+
+  // Unified Image State
+  const [images, setImages] = useState<ImageItem[]>([]);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   // Video State'leri
   const [existingVideos, setExistingVideos] = useState<string[]>([]);
@@ -73,7 +80,14 @@ export default function EditDesignPage() {
         // Remove category from specs object to avoid duplication/conflicts in state
         const { category, ...restSpecs } = data.specs || {};
         setSpecs(restSpecs);
-        setExistingImages(data.image_urls || []);
+        // Populate images state
+        const loadedImages: ImageItem[] = (data.image_urls || []).map((url: string, idx: number) => ({
+          type: 'existing',
+          id: `existing-${idx}`,
+          url
+        }));
+        setImages(loadedImages);
+
         setExistingVideos(data.video_urls || []);
       }
       setLoading(false);
@@ -100,110 +114,75 @@ export default function EditDesignPage() {
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const files = Array.from(e.target.files);
-      setNewFiles(prev => [...prev, ...files]);
-
-      const previews = files.map(file => URL.createObjectURL(file));
-      setNewPreviews(prev => [...prev, ...previews]);
+      const newItems: ImageItem[] = files.map((file, idx) => ({
+        type: 'new',
+        id: `new-${Date.now()}-${idx}`,
+        file,
+        previewUrl: URL.createObjectURL(file)
+      }));
+      setImages(prev => [...prev, ...newItems]);
     }
   };
 
-  const removeExistingImage = (index: number) => {
+  const removeImage = (index: number) => {
     if (window.confirm("Bu fotoğrafı silmek istediğinize emin misiniz?")) {
-      setExistingImages(prev => prev.filter((_, i) => i !== index));
+      setImages(prev => {
+        const item = prev[index];
+        if (item.type === 'new') {
+          URL.revokeObjectURL(item.previewUrl);
+        }
+        return prev.filter((_, i) => i !== index);
+      });
     }
   };
 
-  const removeNewFile = (index: number) => {
-    setNewFiles(prev => prev.filter((_, i) => i !== index));
-    setNewPreviews(prev => {
-      URL.revokeObjectURL(prev[index]);
-      return prev.filter((_, i) => i !== index);
+  // Drag and Drop Handlers
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+    // Set a transparent ghost image or just let default happen
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+
+    // Optional: Add visual indicator here
+  };
+
+  const handleDrop = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+
+    setImages(prev => {
+      const newArr = [...prev];
+      const [movedItem] = newArr.splice(draggedIndex, 1);
+      newArr.splice(index, 0, movedItem);
+      return newArr;
+    });
+    setDraggedIndex(null);
+  };
+
+  // Arrow Movement Handlers
+  const moveImage = (fromIndex: number, direction: 'left' | 'right') => {
+    const toIndex = direction === 'left' ? fromIndex - 1 : fromIndex + 1;
+    if (toIndex < 0 || toIndex >= images.length) return;
+
+    setImages(prev => {
+      const newArr = [...prev];
+      [newArr[fromIndex], newArr[toIndex]] = [newArr[toIndex], newArr[fromIndex]];
+      return newArr;
     });
   };
 
-  // Image reordering functions
-  const moveImageLeft = (index: number, isExisting: boolean) => {
+  const setCover = (index: number) => {
     if (index === 0) return;
-    if (isExisting) {
-      setExistingImages(prev => {
-        const newArr = [...prev];
-        [newArr[index - 1], newArr[index]] = [newArr[index], newArr[index - 1]];
-        return newArr;
-      });
-    } else {
-      const adjustedIndex = index - existingImages.length;
-      setNewFiles(prev => {
-        const newArr = [...prev];
-        [newArr[adjustedIndex - 1], newArr[adjustedIndex]] = [newArr[adjustedIndex], newArr[adjustedIndex - 1]];
-        return newArr;
-      });
-      setNewPreviews(prev => {
-        const newArr = [...prev];
-        [newArr[adjustedIndex - 1], newArr[adjustedIndex]] = [newArr[adjustedIndex], newArr[adjustedIndex - 1]];
-        return newArr;
-      });
-    }
-  };
-
-  const moveImageRight = (index: number, isExisting: boolean, totalCount: number) => {
-    if (index === totalCount - 1) return;
-    if (isExisting) {
-      if (index === existingImages.length - 1) {
-        // Move to first position of new images
-        return;
-      }
-      setExistingImages(prev => {
-        const newArr = [...prev];
-        [newArr[index], newArr[index + 1]] = [newArr[index + 1], newArr[index]];
-        return newArr;
-      });
-    } else {
-      const adjustedIndex = index - existingImages.length;
-      setNewFiles(prev => {
-        const newArr = [...prev];
-        [newArr[adjustedIndex], newArr[adjustedIndex + 1]] = [newArr[adjustedIndex + 1], newArr[adjustedIndex]];
-        return newArr;
-      });
-      setNewPreviews(prev => {
-        const newArr = [...prev];
-        [newArr[adjustedIndex], newArr[adjustedIndex + 1]] = [newArr[adjustedIndex + 1], newArr[adjustedIndex]];
-        return newArr;
-      });
-    }
-  };
-
-  const setCoverImage = (index: number, isExisting: boolean) => {
-    if (index === 0) return;
-    if (isExisting) {
-      setExistingImages(prev => {
-        const newArr = [...prev];
-        const [moved] = newArr.splice(index, 1);
-        newArr.unshift(moved);
-        return newArr;
-      });
-    } else {
-      const adjustedIndex = index - existingImages.length;
-      // Move to start of existing images
-      const fileToMove = newFiles[adjustedIndex];
-      const previewToMove = newPreviews[adjustedIndex];
-
-      // Upload the file to get URL, or just move preview for now
-      setNewFiles(prev => prev.filter((_, i) => i !== adjustedIndex));
-      setNewPreviews(prev => {
-        const newArr = prev.filter((_, i) => i !== adjustedIndex);
-        return newArr;
-      });
-
-      // For new files, just reorder within new files
-      setNewFiles(prev => {
-        const newArr = [fileToMove, ...prev.filter((_, i) => i !== adjustedIndex)];
-        return newArr;
-      });
-      setNewPreviews(prev => {
-        const newArr = [previewToMove, ...prev.filter((_, i) => i !== adjustedIndex)];
-        return newArr;
-      });
-    }
+    setImages(prev => {
+      const newArr = [...prev];
+      const [moved] = newArr.splice(index, 1);
+      newArr.unshift(moved);
+      return newArr;
+    });
   };
 
   // Video İşlemleri
@@ -445,23 +424,29 @@ export default function EditDesignPage() {
     setSaving(true);
 
     try {
-      const uploadedUrls: string[] = [];
-      for (let i = 0; i < newFiles.length; i++) {
-        const file = newFiles[i];
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}-${i}-design-edit.${fileExt}`;
+      const finalImages: string[] = [];
 
-        const { error: uploadError } = await supabase.storage
-          .from('design-images')
-          .upload(fileName, file);
+      for (const item of images) {
+        if (item.type === 'existing') {
+          finalImages.push(item.url);
+        } else {
+          // Upload new file
+          const file = item.file;
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}-design-edit.${fileExt}`;
 
-        if (uploadError) throw uploadError;
+          const { error: uploadError } = await supabase.storage
+            .from('design-images')
+            .upload(fileName, file);
 
-        const { data: urlData } = supabase.storage
-          .from('design-images')
-          .getPublicUrl(fileName);
+          if (uploadError) throw uploadError;
 
-        uploadedUrls.push(urlData.publicUrl);
+          const { data: urlData } = supabase.storage
+            .from('design-images')
+            .getPublicUrl(fileName);
+
+          finalImages.push(urlData.publicUrl);
+        }
       }
 
       // 2. Yeni Videoları Yükle
@@ -484,7 +469,8 @@ export default function EditDesignPage() {
         uploadedVideoUrls.push(urlData.publicUrl);
       }
 
-      const finalImages = [...existingImages, ...uploadedUrls];
+      // Video upload logic stays same (omitted changes)
+
       const finalVideos = [...existingVideos, ...uploadedVideoUrls];
 
       const { error: updateError } = await supabase
@@ -566,108 +552,75 @@ export default function EditDesignPage() {
             <p className="text-xs text-white/50">İlk fotoğraf kapak olarak kullanılır. Hover ile sırala.</p>
 
             <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
-              {existingImages.map((url, idx) => {
-                const totalCount = existingImages.length + newPreviews.length;
-                return (
-                  <div key={`old-${idx}`} className={`relative aspect-square rounded-lg overflow-hidden border-2 group ${idx === 0 ? 'border-fbm-gold-400 ring-2 ring-fbm-gold-400/50' : 'border-green-500/30'}`}>
-                    <Image src={url} alt="Mevcut" fill className="object-cover" sizes="(max-width: 640px) 25vw, 20vw" />
-                    {idx === 0 && (
-                      <div className="absolute top-1 left-1 bg-fbm-gold-400 text-fbm-navy-900 text-[10px] font-bold px-2 py-0.5 rounded z-10">
-                        KAPAK
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => moveImageLeft(idx, true)}
-                        disabled={idx === 0}
-                        className="bg-fbm-navy-900/90 text-white p-1.5 rounded hover:bg-fbm-gold-400 hover:text-fbm-navy-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        title="Sola Taşı"
-                      >
-                        ←
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setCoverImage(idx, true)}
-                        disabled={idx === 0}
-                        className="bg-fbm-gold-400 text-fbm-navy-900 p-1.5 rounded hover:bg-fbm-bronze-400 font-bold text-xs disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        title="Kapak Yap"
-                      >
-                        ⭐
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => moveImageRight(idx, true, totalCount)}
-                        disabled={idx === existingImages.length - 1 && newPreviews.length === 0}
-                        className="bg-fbm-navy-900/90 text-white p-1.5 rounded hover:bg-fbm-gold-400 hover:text-fbm-navy-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        title="Sağa Taşı"
-                      >
-                        →
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => removeExistingImage(idx)}
-                        className="bg-red-600/90 text-white p-1.5 rounded hover:bg-red-500 transition-colors absolute top-1 right-1"
-                        title="Sil"
-                      >
-                        <X size={12} />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-              {newPreviews.map((url, idx) => {
-                const globalIdx = existingImages.length + idx;
-                const totalCount = existingImages.length + newPreviews.length;
-                return (
-                  <div key={`new-${idx}`} className={`relative aspect-square rounded-lg overflow-hidden border-2 group ${globalIdx === 0 ? 'border-fbm-gold-400 ring-2 ring-fbm-gold-400/50' : 'border-yellow-500/30'}`}>
-                    <Image src={url} alt="Yeni" fill className="object-cover" sizes="(max-width: 640px) 25vw, 20vw" />
+              {images.map((item, idx) => (
+                <div
+                  key={item.id}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, idx)}
+                  onDragOver={(e) => handleDragOver(e, idx)}
+                  onDrop={(e) => handleDrop(e, idx)}
+                  className={`relative aspect-square rounded-lg overflow-hidden border-2 group cursor-move ${idx === 0
+                    ? 'border-fbm-gold-400 ring-2 ring-fbm-gold-400/50'
+                    : item.type === 'new' ? 'border-yellow-500/30' : 'border-green-500/30'
+                    } ${draggedIndex === idx ? 'opacity-50' : ''}`}
+                >
+                  <Image
+                    src={item.type === 'existing' ? item.url : item.previewUrl}
+                    alt="Proje Görseli"
+                    fill
+                    className="object-cover pointer-events-none"
+                    sizes="(max-width: 640px) 25vw, 20vw"
+                  />
+
+                  {item.type === 'new' && (
                     <div className="absolute bottom-0 left-0 right-0 bg-yellow-500/80 text-black text-[10px] text-center py-1">YENİ</div>
-                    {globalIdx === 0 && (
-                      <div className="absolute top-1 left-1 bg-fbm-gold-400 text-fbm-navy-900 text-[10px] font-bold px-2 py-0.5 rounded z-10">
-                        KAPAK
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => moveImageLeft(globalIdx, false)}
-                        disabled={idx === 0}
-                        className="bg-fbm-navy-900/90 text-white p-1.5 rounded hover:bg-fbm-gold-400 hover:text-fbm-navy-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        title="Sola Taşı"
-                      >
-                        ←
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setCoverImage(globalIdx, false)}
-                        disabled={globalIdx === 0}
-                        className="bg-fbm-gold-400 text-fbm-navy-900 p-1.5 rounded hover:bg-fbm-bronze-400 font-bold text-xs disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        title="Kapak Yap"
-                      >
-                        ⭐
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => moveImageRight(globalIdx, false, totalCount)}
-                        disabled={idx === newPreviews.length - 1}
-                        className="bg-fbm-navy-900/90 text-white p-1.5 rounded hover:bg-fbm-gold-400 hover:text-fbm-navy-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        title="Sağa Taşı"
-                      >
-                        →
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => removeNewFile(idx)}
-                        className="bg-red-600/90 text-white p-1.5 rounded hover:bg-red-500 transition-colors absolute top-1 right-1"
-                        title="Sil"
-                      >
-                        <X size={12} />
-                      </button>
+                  )}
+
+                  {idx === 0 && (
+                    <div className="absolute top-1 left-1 bg-fbm-gold-400 text-fbm-navy-900 text-[10px] font-bold px-2 py-0.5 rounded z-10">
+                      KAPAK
                     </div>
+                  )}
+
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => moveImage(idx, 'left')}
+                      disabled={idx === 0}
+                      className="bg-fbm-navy-900/90 text-white p-1.5 rounded hover:bg-fbm-gold-400 hover:text-fbm-navy-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      title="Sola Taşı"
+                    >
+                      ←
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCover(idx)}
+                      disabled={idx === 0}
+                      className="bg-fbm-gold-400 text-fbm-navy-900 p-1.5 rounded hover:bg-fbm-bronze-400 font-bold text-xs disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      title="Kapak Yap"
+                    >
+                      ⭐
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => moveImage(idx, 'right')}
+                      disabled={idx === images.length - 1}
+                      className="bg-fbm-navy-900/90 text-white p-1.5 rounded hover:bg-fbm-gold-400 hover:text-fbm-navy-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      title="Sağa Taşı"
+                    >
+                      →
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeImage(idx)}
+                      className="bg-red-600/90 text-white p-1.5 rounded hover:bg-red-500 transition-colors absolute top-1 right-1"
+                      title="Sil"
+                    >
+                      <X size={12} />
+                    </button>
                   </div>
-                );
-              })}
+                </div>
+              ))}
 
               <label className="aspect-square rounded border-2 border-dashed border-white/20 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-colors text-white/50 hover:text-white hover:border-white/40 relative">
                 <Plus size={24} />
