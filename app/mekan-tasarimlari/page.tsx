@@ -125,7 +125,7 @@ function MekanTasarimlariContent() {
             </p>
           </motion.div>
 
-      /* Filter Tabs */
+
           <FilterTabs
             categories={DESIGN_FILTER_OPTIONS.filter(c => !['Otel Konsepti', 'Villa Projesi'].includes(c))}
             activeCategory={activeCategory}
