@@ -139,8 +139,8 @@ export default function EditDesignPage() {
   // Drag and Drop Handlers
   const handleDragStart = (e: React.DragEvent, index: number) => {
     setDraggedIndex(index);
+    e.dataTransfer.setData('text/plain', index.toString());
     e.dataTransfer.effectAllowed = "move";
-    // Set a transparent ghost image or just let default happen
   };
 
   const handleDragOver = (e: React.DragEvent, index: number) => {
@@ -152,11 +152,13 @@ export default function EditDesignPage() {
 
   const handleDrop = (e: React.DragEvent, index: number) => {
     e.preventDefault();
+    e.stopPropagation();
     if (draggedIndex === null || draggedIndex === index) return;
 
     setImages(prev => {
       const newArr = [...prev];
-      const [movedItem] = newArr.splice(draggedIndex, 1);
+      const movedItem = newArr[draggedIndex];
+      newArr.splice(draggedIndex, 1);
       newArr.splice(index, 0, movedItem);
       return newArr;
     });
