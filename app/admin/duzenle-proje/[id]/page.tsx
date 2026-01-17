@@ -6,6 +6,16 @@ import { useParams, useRouter } from 'next/navigation';
 import { createClient } from '@/app/lib/supabaseBrowser';
 import Image from 'next/image';
 import { ArrowLeft, X, Plus } from 'lucide-react';
+import {
+  DESIGN_CATEGORIES,
+  POOL_SYSTEM_TYPES,
+  BUDGET_SEGMENTS,
+  type DesignCategory,
+  type DesignSpecs
+} from '@/app/lib/constants';
+
+// Partial spec state for form
+type PartialSpecs = Omit<DesignSpecs, 'category'> | Record<string, unknown>;
 
 export default function EditDesignPage() {
   const supabase = createClient();
@@ -16,12 +26,14 @@ export default function EditDesignPage() {
 
   const [formData, setFormData] = useState({
     title: '',
-    type: '',
+    type: '' as DesignCategory | '',
     location: '',
     area: 0,
     year: new Date().getFullYear(),
     description: ''
   });
+
+  const [specs, setSpecs] = useState<PartialSpecs>({});
 
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [newFiles, setNewFiles] = useState<File[]>([]);
@@ -58,6 +70,9 @@ export default function EditDesignPage() {
           year: data.year,
           description: data.description || ''
         });
+        // Remove category from specs object to avoid duplication/conflicts in state
+        const { category, ...restSpecs } = data.specs || {};
+        setSpecs(restSpecs);
         setExistingImages(data.image_urls || []);
         setExistingVideos(data.video_urls || []);
       }
@@ -70,6 +85,16 @@ export default function EditDesignPage() {
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const newCategory = e.target.value as DesignCategory;
+    setFormData(prev => ({ ...prev, type: newCategory }));
+    setSpecs({}); // Reset specs on category change
+  };
+
+  const updateSpec = (key: string, value: string | number | boolean) => {
+    setSpecs(prev => ({ ...prev, [key]: value }));
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -210,6 +235,211 @@ export default function EditDesignPage() {
     });
   };
 
+  // Render category-specific spec inputs
+  const renderSpecInputs = () => {
+    const inputClass = "w-full bg-fbm-navy-900 p-3 rounded border border-white/10 focus:border-fbm-gold-400 outline-none text-white";
+    const labelClass = "block text-xs text-fbm-gold-400 mb-1";
+
+    if (!formData.type) return null;
+
+    switch (formData.type) {
+      case 'Havuz Tasarımı':
+        return (
+          <div className="space-y-4 p-4 bg-fbm-navy-900/50 rounded-lg border border-blue-500/30">
+            <h3 className="text-sm font-bold text-blue-400">🏊 Havuz Teknik Özellikleri</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Derinlik (cm)</label>
+                <input
+                  type="number"
+                  value={(specs as { depth?: number }).depth || ''}
+                  onChange={e => updateSpec('depth', Number(e.target.value))}
+                  placeholder="150"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Su Hacmi (m³)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={(specs as { volume_m3?: number }).volume_m3 || ''}
+                  onChange={e => updateSpec('volume_m3', Number(e.target.value))}
+                  placeholder="50"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Sistem Tipi</label>
+                <select
+                  value={(specs as { systemType?: string }).systemType || ''}
+                  onChange={e => updateSpec('systemType', e.target.value)}
+                  className={inputClass}
+                >
+                  <option value="">Seçiniz</option>
+                  {POOL_SYSTEM_TYPES.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className={labelClass}>Kaplama Malzemesi</label>
+                <input
+                  type="text"
+                  value={(specs as { coatingMaterial?: string }).coatingMaterial || ''}
+                  onChange={e => updateSpec('coatingMaterial', e.target.value)}
+                  placeholder="Mozaik, Liner, vb."
+                  className={inputClass}
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'Peyzaj & Bahçe':
+        return (
+          <div className="space-y-4 p-4 bg-fbm-navy-900/50 rounded-lg border border-green-500/30">
+            <h3 className="text-sm font-bold text-green-400">🌳 Peyzaj Teknik Özellikleri</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Sert Zemin Alanı (m²)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={(specs as { hardscapeArea_m2?: number }).hardscapeArea_m2 || ''}
+                  onChange={e => updateSpec('hardscapeArea_m2', Number(e.target.value))}
+                  placeholder="100"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Yeşil Alan (m²)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={(specs as { softscapeArea_m2?: number }).softscapeArea_m2 || ''}
+                  onChange={e => updateSpec('softscapeArea_m2', Number(e.target.value))}
+                  placeholder="200"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Bitki Çeşidi Sayısı</label>
+                <input
+                  type="number"
+                  value={(specs as { plantVarietyCount?: number }).plantVarietyCount || ''}
+                  onChange={e => updateSpec('plantVarietyCount', Number(e.target.value))}
+                  placeholder="15"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Sulama Sistemi</label>
+                <select
+                  value={(specs as { irrigationSystem?: boolean }).irrigationSystem === true ? 'true' : (specs as { irrigationSystem?: boolean }).irrigationSystem === false ? 'false' : ''}
+                  onChange={e => updateSpec('irrigationSystem', e.target.value === 'true')}
+                  className={inputClass}
+                >
+                  <option value="">Seçiniz</option>
+                  <option value="true">Mevcut</option>
+                  <option value="false">Yok</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'Konut İç Mekan':
+      case 'Ticari İç Mekan':
+      case 'Ofis Tasarımı':
+      case 'Otel Konsepti':
+      case 'Villa Projesi':
+        return (
+          <div className="space-y-4 p-4 bg-fbm-navy-900/50 rounded-lg border border-amber-500/30">
+            <h3 className="text-sm font-bold text-amber-400">🏠 İç Mekan Teknik Özellikleri</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Oda Sayısı</label>
+                <input
+                  type="number"
+                  value={(specs as { roomCount?: number }).roomCount || ''}
+                  onChange={e => updateSpec('roomCount', Number(e.target.value))}
+                  placeholder="5"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Bütçe Segmenti</label>
+                <select
+                  value={(specs as { budgetSegment?: string }).budgetSegment || ''}
+                  onChange={e => updateSpec('budgetSegment', e.target.value)}
+                  className={inputClass}
+                >
+                  <option value="">Seçiniz</option>
+                  {BUDGET_SEGMENTS.map(segment => (
+                    <option key={segment} value={segment}>{segment}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-span-2">
+                <label className={labelClass}>Tasarım Stili</label>
+                <input
+                  type="text"
+                  value={(specs as { style?: string }).style || ''}
+                  onChange={e => updateSpec('style', e.target.value)}
+                  placeholder="Modern, Minimalist, Klasik, vb."
+                  className={inputClass}
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'Cephe Tasarımı':
+        return (
+          <div className="space-y-4 p-4 bg-fbm-navy-900/50 rounded-lg border border-purple-500/30">
+            <h3 className="text-sm font-bold text-purple-400">🏢 Cephe Teknik Özellikleri</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>Cephe Malzemesi</label>
+                <input
+                  type="text"
+                  value={(specs as { material?: string }).material || ''}
+                  onChange={e => updateSpec('material', e.target.value)}
+                  placeholder="Cam, Alüminyum, Taş, vb."
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Yalıtım Tipi</label>
+                <input
+                  type="text"
+                  value={(specs as { insulationType?: string }).insulationType || ''}
+                  onChange={e => updateSpec('insulationType', e.target.value)}
+                  placeholder="Mantolama, Cam Yünü, vb."
+                  className={inputClass}
+                />
+              </div>
+              <div className="col-span-2">
+                <label className={labelClass}>Bina Yüksekliği (m)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={(specs as { buildingHeight_m?: number }).buildingHeight_m || ''}
+                  onChange={e => updateSpec('buildingHeight_m', Number(e.target.value))}
+                  placeholder="25"
+                  className={inputClass}
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -262,7 +492,8 @@ export default function EditDesignPage() {
         .update({
           ...formData,
           image_urls: finalImages,
-          video_urls: finalVideos
+          video_urls: finalVideos,
+          specs: Object.keys(specs).length > 0 ? { ...specs, category: formData.type } : null
         })
         .eq('id', params.id);
 
@@ -302,13 +533,10 @@ export default function EditDesignPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs text-fbm-gold-400 mb-1">Tasarım Tipi</label>
-              <select name="type" value={formData.type} onChange={handleInputChange} className="w-full bg-fbm-navy-900 p-3 rounded border border-white/10 text-white">
-                <option value="İç Tasarım">İç Tasarım</option>
-                <option value="Dış Tasarım">Dış Tasarım</option>
-                <option value="Peyzaj">Peyzaj</option>
-                <option value="Ofis Tasarımı">Ofis Tasarımı</option>
-                <option value="Konut Tasarımı">Konut Tasarımı</option>
-                <option value="Ticari Mekan">Ticari Mekan</option>
+              <select name="type" value={formData.type} onChange={handleCategoryChange} className="w-full bg-fbm-navy-900 p-3 rounded border border-white/10 text-white">
+                {DESIGN_CATEGORIES.map((category) => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
               </select>
             </div>
             <div>
@@ -327,6 +555,9 @@ export default function EditDesignPage() {
               <input name="year" type="number" value={formData.year} onChange={handleInputChange} required min="2000" max={new Date().getFullYear()} className="w-full bg-fbm-navy-900 p-3 rounded border border-white/10 focus:border-fbm-gold-400 outline-none" />
             </div>
           </div>
+
+          {/* Dynamic Spec Inputs */}
+          {renderSpecInputs()}
 
           <textarea name="description" value={formData.description} onChange={handleInputChange} rows={4} placeholder="Açıklama" className="w-full bg-fbm-navy-900 p-3 rounded border border-white/10 focus:border-fbm-gold-400 outline-none"></textarea>
 
