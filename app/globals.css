@@ -133,3 +133,38 @@ img {
 .border-hover:hover {
   border-color: rgba(188, 150, 72, 0.3);
 }
+
+/* ====================================
+   FORM ELEMENTS - Windows Compatibility
+   ==================================== */
+/* Fix for native select dropdowns on Windows */
+select {
+  background-color: #12161f !important;
+  color: white !important;
+}
+
+select option {
+  background-color: #1a202c !important;
+  color: white !important;
+  padding: 12px !important;
+}
+
+select option:hover,
+select option:focus,
+select option:checked {
+  background-color: #2d3748 !important;
+  color: #bc9648 !important;
+}
+
+/* Ensure select has proper appearance */
+select::-ms-expand {
+  display: none;
+}
+
+/* Firefox specific fix */
+@-moz-document url-prefix() {
+  select option {
+    background-color: #1a202c !important;
+    color: white !important;
+  }
+}
