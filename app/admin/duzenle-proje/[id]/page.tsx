@@ -13,7 +13,7 @@ export default function EditDesignPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     title: '',
     type: '',
@@ -76,15 +76,15 @@ export default function EditDesignPage() {
     if (e.target.files && e.target.files.length > 0) {
       const files = Array.from(e.target.files);
       setNewFiles(prev => [...prev, ...files]);
-      
+
       const previews = files.map(file => URL.createObjectURL(file));
       setNewPreviews(prev => [...prev, ...previews]);
     }
   };
 
   const removeExistingImage = (index: number) => {
-    if(window.confirm("Bu fotoğrafı silmek istediğinize emin misiniz?")) {
-        setExistingImages(prev => prev.filter((_, i) => i !== index));
+    if (window.confirm("Bu fotoğrafı silmek istediğinize emin misiniz?")) {
+      setExistingImages(prev => prev.filter((_, i) => i !== index));
     }
   };
 
@@ -94,6 +94,91 @@ export default function EditDesignPage() {
       URL.revokeObjectURL(prev[index]);
       return prev.filter((_, i) => i !== index);
     });
+  };
+
+  // Image reordering functions
+  const moveImageLeft = (index: number, isExisting: boolean) => {
+    if (index === 0) return;
+    if (isExisting) {
+      setExistingImages(prev => {
+        const newArr = [...prev];
+        [newArr[index - 1], newArr[index]] = [newArr[index], newArr[index - 1]];
+        return newArr;
+      });
+    } else {
+      const adjustedIndex = index - existingImages.length;
+      setNewFiles(prev => {
+        const newArr = [...prev];
+        [newArr[adjustedIndex - 1], newArr[adjustedIndex]] = [newArr[adjustedIndex], newArr[adjustedIndex - 1]];
+        return newArr;
+      });
+      setNewPreviews(prev => {
+        const newArr = [...prev];
+        [newArr[adjustedIndex - 1], newArr[adjustedIndex]] = [newArr[adjustedIndex], newArr[adjustedIndex - 1]];
+        return newArr;
+      });
+    }
+  };
+
+  const moveImageRight = (index: number, isExisting: boolean, totalCount: number) => {
+    if (index === totalCount - 1) return;
+    if (isExisting) {
+      if (index === existingImages.length - 1) {
+        // Move to first position of new images
+        return;
+      }
+      setExistingImages(prev => {
+        const newArr = [...prev];
+        [newArr[index], newArr[index + 1]] = [newArr[index + 1], newArr[index]];
+        return newArr;
+      });
+    } else {
+      const adjustedIndex = index - existingImages.length;
+      setNewFiles(prev => {
+        const newArr = [...prev];
+        [newArr[adjustedIndex], newArr[adjustedIndex + 1]] = [newArr[adjustedIndex + 1], newArr[adjustedIndex]];
+        return newArr;
+      });
+      setNewPreviews(prev => {
+        const newArr = [...prev];
+        [newArr[adjustedIndex], newArr[adjustedIndex + 1]] = [newArr[adjustedIndex + 1], newArr[adjustedIndex]];
+        return newArr;
+      });
+    }
+  };
+
+  const setCoverImage = (index: number, isExisting: boolean) => {
+    if (index === 0) return;
+    if (isExisting) {
+      setExistingImages(prev => {
+        const newArr = [...prev];
+        const [moved] = newArr.splice(index, 1);
+        newArr.unshift(moved);
+        return newArr;
+      });
+    } else {
+      const adjustedIndex = index - existingImages.length;
+      // Move to start of existing images
+      const fileToMove = newFiles[adjustedIndex];
+      const previewToMove = newPreviews[adjustedIndex];
+
+      // Upload the file to get URL, or just move preview for now
+      setNewFiles(prev => prev.filter((_, i) => i !== adjustedIndex));
+      setNewPreviews(prev => {
+        const newArr = prev.filter((_, i) => i !== adjustedIndex);
+        return newArr;
+      });
+
+      // For new files, just reorder within new files
+      setNewFiles(prev => {
+        const newArr = [fileToMove, ...prev.filter((_, i) => i !== adjustedIndex)];
+        return newArr;
+      });
+      setNewPreviews(prev => {
+        const newArr = [previewToMove, ...prev.filter((_, i) => i !== adjustedIndex)];
+        return newArr;
+      });
+    }
   };
 
   // Video İşlemleri
@@ -112,8 +197,8 @@ export default function EditDesignPage() {
   };
 
   const removeExistingVideo = (index: number) => {
-    if(window.confirm("Bu videoyu silmek istediğinize emin misiniz?")) {
-        setExistingVideos(prev => prev.filter((_, i) => i !== index));
+    if (window.confirm("Bu videoyu silmek istediğinize emin misiniz?")) {
+      setExistingVideos(prev => prev.filter((_, i) => i !== index));
     }
   };
 
@@ -135,7 +220,7 @@ export default function EditDesignPage() {
         const file = newFiles[i];
         const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}-${i}-design-edit.${fileExt}`;
-        
+
         const { error: uploadError } = await supabase.storage
           .from('design-images')
           .upload(fileName, file);
@@ -155,7 +240,7 @@ export default function EditDesignPage() {
         const file = newVideos[i];
         const fileExt = file.name.split('.').pop();
         const fileName = `video-${Date.now()}-${i}-design-edit.${fileExt}`;
-        
+
         const { error: uploadError } = await supabase.storage
           .from('design-images') // Videoları da design-images bucket'ına yükleyebiliriz
           .upload(fileName, file);
@@ -185,7 +270,7 @@ export default function EditDesignPage() {
 
       alert('Proje başarıyla güncellendi!');
       router.push('/admin/panel');
-      
+
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
       alert('Hata oluştu: ' + errorMessage);
@@ -199,19 +284,19 @@ export default function EditDesignPage() {
   return (
     <main className="min-h-screen pt-40 md:pt-48 px-4 pb-20 bg-fbm-navy-900 text-white">
       <div className="max-w-3xl mx-auto bg-fbm-denim-750 p-8 rounded-xl border border-fbm-gold-400/30 shadow-2xl">
-        
+
         <div className="flex items-center justify-between mb-8">
-            <button onClick={() => router.back()} className="flex items-center text-fbm-gold-400 hover:text-white transition-colors">
-                <ArrowLeft className="mr-2" size={20} /> Geri
-            </button>
-            <h1 className="text-3xl font-serif text-fbm-gold-400">Projeyi Düzenle</h1>
+          <button onClick={() => router.back()} className="flex items-center text-fbm-gold-400 hover:text-white transition-colors">
+            <ArrowLeft className="mr-2" size={20} /> Geri
+          </button>
+          <h1 className="text-3xl font-serif text-fbm-gold-400">Projeyi Düzenle</h1>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="space-y-5 font-sans">
-          
+
           <div>
-             <label className="block text-xs text-fbm-gold-400 mb-1">Başlık</label>
-             <input name="title" value={formData.title} onChange={handleInputChange} required className="w-full bg-fbm-navy-900 p-3 rounded border border-white/10 focus:border-fbm-gold-400 outline-none" />
+            <label className="block text-xs text-fbm-gold-400 mb-1">Başlık</label>
+            <input name="title" value={formData.title} onChange={handleInputChange} required className="w-full bg-fbm-navy-900 p-3 rounded border border-white/10 focus:border-fbm-gold-400 outline-none" />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -234,12 +319,12 @@ export default function EditDesignPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-                <label className="block text-xs text-fbm-gold-400 mb-1">Alan (m²)</label>
-                <input name="area" type="number" value={formData.area} onChange={handleInputChange} required className="w-full bg-fbm-navy-900 p-3 rounded border border-white/10 focus:border-fbm-gold-400 outline-none" />
+              <label className="block text-xs text-fbm-gold-400 mb-1">Alan (m²)</label>
+              <input name="area" type="number" value={formData.area} onChange={handleInputChange} required className="w-full bg-fbm-navy-900 p-3 rounded border border-white/10 focus:border-fbm-gold-400 outline-none" />
             </div>
             <div>
-                <label className="block text-xs text-fbm-gold-400 mb-1">Yıl</label>
-                <input name="year" type="number" value={formData.year} onChange={handleInputChange} required min="2000" max={new Date().getFullYear()} className="w-full bg-fbm-navy-900 p-3 rounded border border-white/10 focus:border-fbm-gold-400 outline-none" />
+              <label className="block text-xs text-fbm-gold-400 mb-1">Yıl</label>
+              <input name="year" type="number" value={formData.year} onChange={handleInputChange} required min="2000" max={new Date().getFullYear()} className="w-full bg-fbm-navy-900 p-3 rounded border border-white/10 focus:border-fbm-gold-400 outline-none" />
             </div>
           </div>
 
@@ -247,69 +332,155 @@ export default function EditDesignPage() {
 
           <div className="space-y-4 border-t border-white/10 pt-4">
             <label className="block text-sm font-bold text-fbm-gold-400">Fotoğraflar</label>
-            
+            <p className="text-xs text-white/50">İlk fotoğraf kapak olarak kullanılır. Hover ile sırala.</p>
+
             <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
-                {existingImages.map((url, idx) => (
-                    <div key={`old-${idx}`} className="relative aspect-square rounded border border-green-500/30 group">
-                        <Image src={url} alt="Mevcut" fill className="object-cover rounded" sizes="(max-width: 640px) 25vw, 20vw" />
-                        <button type="button" onClick={() => removeExistingImage(idx)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs z-10">
-                            <X size={12} />
-                        </button>
+              {existingImages.map((url, idx) => {
+                const totalCount = existingImages.length + newPreviews.length;
+                return (
+                  <div key={`old-${idx}`} className={`relative aspect-square rounded-lg overflow-hidden border-2 group ${idx === 0 ? 'border-fbm-gold-400 ring-2 ring-fbm-gold-400/50' : 'border-green-500/30'}`}>
+                    <Image src={url} alt="Mevcut" fill className="object-cover" sizes="(max-width: 640px) 25vw, 20vw" />
+                    {idx === 0 && (
+                      <div className="absolute top-1 left-1 bg-fbm-gold-400 text-fbm-navy-900 text-[10px] font-bold px-2 py-0.5 rounded z-10">
+                        KAPAK
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => moveImageLeft(idx, true)}
+                        disabled={idx === 0}
+                        className="bg-fbm-navy-900/90 text-white p-1.5 rounded hover:bg-fbm-gold-400 hover:text-fbm-navy-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        title="Sola Taşı"
+                      >
+                        ←
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCoverImage(idx, true)}
+                        disabled={idx === 0}
+                        className="bg-fbm-gold-400 text-fbm-navy-900 p-1.5 rounded hover:bg-fbm-bronze-400 font-bold text-xs disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        title="Kapak Yap"
+                      >
+                        ⭐
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveImageRight(idx, true, totalCount)}
+                        disabled={idx === existingImages.length - 1 && newPreviews.length === 0}
+                        className="bg-fbm-navy-900/90 text-white p-1.5 rounded hover:bg-fbm-gold-400 hover:text-fbm-navy-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        title="Sağa Taşı"
+                      >
+                        →
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeExistingImage(idx)}
+                        className="bg-red-600/90 text-white p-1.5 rounded hover:bg-red-500 transition-colors absolute top-1 right-1"
+                        title="Sil"
+                      >
+                        <X size={12} />
+                      </button>
                     </div>
-                ))}
-                {newPreviews.map((url, idx) => (
-                    <div key={`new-${idx}`} className="relative aspect-square rounded border border-yellow-500/30 group">
-                        <Image src={url} alt="Yeni" fill className="object-cover rounded" sizes="(max-width: 640px) 25vw, 20vw" />
-                        <div className="absolute bottom-0 left-0 right-0 bg-yellow-500/80 text-black text-[10px] text-center py-1">YENİ</div>
-                        <button type="button" onClick={() => removeNewFile(idx)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs z-10">
-                            <X size={12} />
-                        </button>
+                  </div>
+                );
+              })}
+              {newPreviews.map((url, idx) => {
+                const globalIdx = existingImages.length + idx;
+                const totalCount = existingImages.length + newPreviews.length;
+                return (
+                  <div key={`new-${idx}`} className={`relative aspect-square rounded-lg overflow-hidden border-2 group ${globalIdx === 0 ? 'border-fbm-gold-400 ring-2 ring-fbm-gold-400/50' : 'border-yellow-500/30'}`}>
+                    <Image src={url} alt="Yeni" fill className="object-cover" sizes="(max-width: 640px) 25vw, 20vw" />
+                    <div className="absolute bottom-0 left-0 right-0 bg-yellow-500/80 text-black text-[10px] text-center py-1">YENİ</div>
+                    {globalIdx === 0 && (
+                      <div className="absolute top-1 left-1 bg-fbm-gold-400 text-fbm-navy-900 text-[10px] font-bold px-2 py-0.5 rounded z-10">
+                        KAPAK
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => moveImageLeft(globalIdx, false)}
+                        disabled={idx === 0}
+                        className="bg-fbm-navy-900/90 text-white p-1.5 rounded hover:bg-fbm-gold-400 hover:text-fbm-navy-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        title="Sola Taşı"
+                      >
+                        ←
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCoverImage(globalIdx, false)}
+                        disabled={globalIdx === 0}
+                        className="bg-fbm-gold-400 text-fbm-navy-900 p-1.5 rounded hover:bg-fbm-bronze-400 font-bold text-xs disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        title="Kapak Yap"
+                      >
+                        ⭐
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveImageRight(globalIdx, false, totalCount)}
+                        disabled={idx === newPreviews.length - 1}
+                        className="bg-fbm-navy-900/90 text-white p-1.5 rounded hover:bg-fbm-gold-400 hover:text-fbm-navy-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        title="Sağa Taşı"
+                      >
+                        →
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeNewFile(idx)}
+                        className="bg-red-600/90 text-white p-1.5 rounded hover:bg-red-500 transition-colors absolute top-1 right-1"
+                        title="Sil"
+                      >
+                        <X size={12} />
+                      </button>
                     </div>
-                ))}
-                
-                <label className="aspect-square rounded border-2 border-dashed border-white/20 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-colors text-white/50 hover:text-white hover:border-white/40 relative">
-                    <Plus size={24} />
-                    <span className="text-xs mt-1">Ekle/Sürükle</span>
-                    <input type="file" multiple accept="image/*" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                </label>
+                  </div>
+                );
+              })}
+
+              <label className="aspect-square rounded border-2 border-dashed border-white/20 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-colors text-white/50 hover:text-white hover:border-white/40 relative">
+                <Plus size={24} />
+                <span className="text-xs mt-1">Ekle/Sürükle</span>
+                <input type="file" multiple accept="image/*" onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+              </label>
             </div>
           </div>
 
           {/* Video Yönetimi */}
           <div className="space-y-4 border-t border-white/10 pt-4">
             <label className="block text-sm font-bold text-fbm-gold-400">Videolar</label>
-            
+
             <div className="grid grid-cols-3 gap-3">
-                {existingVideos.map((url, idx) => (
-                    <div key={`old-vid-${idx}`} className="relative aspect-video rounded-lg overflow-hidden border border-green-500/30 group bg-black">
-                        <video src={url} className="w-full h-full object-contain bg-black" controls />
-                        <div className="absolute top-0 right-0 p-1">
-                           <button type="button" onClick={() => removeExistingVideo(idx)} className="bg-red-600 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs z-10">
-                               <X size={12} />
-                           </button>
-                        </div>
-                    </div>
-                ))}
-                {newVideoPreviews.map((url, idx) => (
-                    <div key={`new-vid-${idx}`} className="relative aspect-video rounded-lg overflow-hidden border border-yellow-500/30 group bg-black">
-                        <video src={url} className="w-full h-full object-contain bg-black" controls />
-                        <div className="absolute bottom-0 left-0 right-0 bg-yellow-500/80 text-black text-[10px] text-center py-1">YENİ</div>
-                        <button type="button" onClick={() => removeNewVideo(idx)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs z-10">
-                            <X size={12} />
-                        </button>
-                    </div>
-                ))}
-                
-                <label className="aspect-video rounded border-2 border-dashed border-white/20 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-colors text-white/50 hover:text-white hover:border-white/40 relative">
-                    <span className="text-2xl">🎥</span>
-                    <span className="text-xs mt-1">Ekle/Sürükle</span>
-                    <input type="file" multiple accept="video/*" onChange={handleVideoChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                </label>
+              {existingVideos.map((url, idx) => (
+                <div key={`old-vid-${idx}`} className="relative aspect-video rounded-lg overflow-hidden border border-green-500/30 group bg-black">
+                  <video src={url} className="w-full h-full object-contain bg-black" controls />
+                  <div className="absolute top-0 right-0 p-1">
+                    <button type="button" onClick={() => removeExistingVideo(idx)} className="bg-red-600 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs z-10">
+                      <X size={12} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {newVideoPreviews.map((url, idx) => (
+                <div key={`new-vid-${idx}`} className="relative aspect-video rounded-lg overflow-hidden border border-yellow-500/30 group bg-black">
+                  <video src={url} className="w-full h-full object-contain bg-black" controls />
+                  <div className="absolute bottom-0 left-0 right-0 bg-yellow-500/80 text-black text-[10px] text-center py-1">YENİ</div>
+                  <button type="button" onClick={() => removeNewVideo(idx)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs z-10">
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+
+              <label className="aspect-video rounded border-2 border-dashed border-white/20 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-colors text-white/50 hover:text-white hover:border-white/40 relative">
+                <span className="text-2xl">🎥</span>
+                <span className="text-xs mt-1">Ekle/Sürükle</span>
+                <input type="file" multiple accept="video/*" onChange={handleVideoChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+              </label>
             </div>
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={saving}
             className="w-full py-4 rounded font-bold text-fbm-navy-900 bg-fbm-gold-400 hover:bg-fbm-bronze-400 transition-all disabled:opacity-50"
           >
