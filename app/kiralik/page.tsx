@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/app/lib/supabaseClient';
 import { Filter, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { PropertyCategory } from '@/types';
 
 interface Property {
   id: number;
@@ -18,10 +19,12 @@ interface Property {
   location: string;
   price: string;
   area: number;
-  rooms: number;
-  livingRoom: number;
-  bathrooms: number;
+  category?: PropertyCategory;
+  rooms: number | null;
+  livingRoom: number | null;
+  bathrooms: number | null;
   image: string;
+  zoning_status?: string | null;
 }
 
 interface DBProperty {
@@ -30,10 +33,12 @@ interface DBProperty {
   location: string;
   price: string;
   area: number;
-  rooms: number;
-  living_rooms: number;
-  bathrooms: number;
+  category?: PropertyCategory;
+  rooms: number | null;
+  living_rooms: number | null;
+  bathrooms: number | null;
   image_urls: string[];
+  zoning_status?: string | null;
 }
 
 export default function KiralikPage() {
@@ -44,10 +49,12 @@ export default function KiralikPage() {
     location: '',
     minPrice: '',
     maxPrice: '',
-    rooms: ''
+    rooms: '',
+    category: '' as PropertyCategory | ''
   });
 
-  const hasActiveFilters = filters.location || filters.minPrice || filters.maxPrice || filters.rooms;
+  const hasActiveFilters = filters.location || filters.minPrice || filters.maxPrice || filters.rooms || filters.category;
+  const isLandCategory = filters.category === 'arsa';
 
   useEffect(() => {
     async function fetchProperties() {
@@ -58,8 +65,11 @@ export default function KiralikPage() {
         .eq('type', 'kiralik')
         .eq('status', 'aktif');
 
+      // Apply category filter
+      if (filters.category) query = query.eq('category', filters.category);
       if (filters.location) query = query.ilike('location', `%${filters.location}%`);
-      if (filters.rooms) query = query.eq('rooms', Number(filters.rooms));
+      // Only apply rooms filter if not filtering by 'arsa' category
+      if (filters.rooms && filters.category !== 'arsa') query = query.eq('rooms', Number(filters.rooms));
 
       query = query.order('created_at', { ascending: false });
 
@@ -72,9 +82,11 @@ export default function KiralikPage() {
           location: item.location,
           price: item.price,
           area: item.area,
+          category: item.category || 'konut',
           rooms: item.rooms,
           livingRoom: item.living_rooms,
           bathrooms: item.bathrooms,
+          zoning_status: item.zoning_status,
           image: item.image_urls?.[0] || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800'
         }));
 
@@ -94,6 +106,15 @@ export default function KiralikPage() {
 
     fetchProperties();
   }, [filters]);
+
+  // Handle category change - clear rooms if switching to arsa
+  const handleCategoryChange = (newCategory: PropertyCategory | '') => {
+    if (newCategory === 'arsa') {
+      setFilters({ ...filters, category: newCategory, rooms: '' });
+    } else {
+      setFilters({ ...filters, category: newCategory });
+    }
+  };
 
   return (
     <main className="min-h-screen bg-[#12161f]">
@@ -132,7 +153,45 @@ export default function KiralikPage() {
                 className="overflow-hidden mb-12"
               >
                 <div className="bg-white/[0.02] rounded-2xl border border-white/[0.06] p-8">
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                  {/* Category Filter - Prominent at top */}
+                  <div className="mb-6">
+                    <label className="block text-xs text-white/40 mb-2 tracking-widest uppercase">Kategori</label>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleCategoryChange('')}
+                        className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-300 ${!filters.category
+                            ? 'bg-fbm-gold-400 text-fbm-navy-900'
+                            : 'bg-white/[0.04] text-white/70 hover:bg-white/[0.08] hover:text-white border border-white/[0.08]'
+                          }`}
+                      >
+                        Tümü
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleCategoryChange('konut')}
+                        className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-300 ${filters.category === 'konut'
+                            ? 'bg-fbm-gold-400 text-fbm-navy-900'
+                            : 'bg-white/[0.04] text-white/70 hover:bg-white/[0.08] hover:text-white border border-white/[0.08]'
+                          }`}
+                      >
+                        🏠 Konut
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleCategoryChange('arsa')}
+                        className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-300 ${filters.category === 'arsa'
+                            ? 'bg-fbm-gold-400 text-fbm-navy-900'
+                            : 'bg-white/[0.04] text-white/70 hover:bg-white/[0.08] hover:text-white border border-white/[0.08]'
+                          }`}
+                      >
+                        🏞️ Arsa
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Other Filters */}
+                  <div className={`grid grid-cols-1 gap-6 ${isLandCategory ? 'md:grid-cols-3' : 'md:grid-cols-4'}`}>
                     <div>
                       <label className="block text-xs text-white/40 mb-2 tracking-widest uppercase">Konum</label>
                       <input
@@ -163,24 +222,27 @@ export default function KiralikPage() {
                         className="w-full bg-white/[0.04] p-3 rounded-lg border border-white/[0.08] text-white placeholder:text-white/20 focus:border-fbm-gold-400/50 outline-none text-sm"
                       />
                     </div>
-                    <div>
-                      <label className="block text-xs text-white/40 mb-2 tracking-widest uppercase">Oda</label>
-                      <select
-                        value={filters.rooms}
-                        onChange={(e) => setFilters({ ...filters, rooms: e.target.value })}
-                        className="w-full bg-white/[0.04] p-3 rounded-lg border border-white/[0.08] text-white focus:border-fbm-gold-400/50 outline-none text-sm"
-                      >
-                        <option value="">Tümü</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4+</option>
-                      </select>
-                    </div>
+                    {/* Rooms filter - Hidden when category is 'arsa' */}
+                    {!isLandCategory && (
+                      <div>
+                        <label className="block text-xs text-white/40 mb-2 tracking-widest uppercase">Oda</label>
+                        <select
+                          value={filters.rooms}
+                          onChange={(e) => setFilters({ ...filters, rooms: e.target.value })}
+                          className="w-full bg-white/[0.04] p-3 rounded-lg border border-white/[0.08] text-white focus:border-fbm-gold-400/50 outline-none text-sm"
+                        >
+                          <option value="">Tümü</option>
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                          <option value="4">4+</option>
+                        </select>
+                      </div>
+                    )}
                   </div>
                   {hasActiveFilters && (
                     <button
-                      onClick={() => setFilters({ location: '', minPrice: '', maxPrice: '', rooms: '' })}
+                      onClick={() => setFilters({ location: '', minPrice: '', maxPrice: '', rooms: '', category: '' })}
                       className="mt-6 flex items-center gap-2 text-xs text-white/40 hover:text-fbm-gold-400 transition-colors tracking-widest uppercase"
                     >
                       <X className="w-3 h-3" /> Temizle

@@ -9,7 +9,7 @@ import { Pagination } from '@/app/components/Pagination';
 import { PageHeader } from '@/app/components/layout/PageHeader';
 import { supabase } from '@/app/lib/supabaseClient';
 import { transformToProperty } from '@/types';
-import type { Property, PropertyRow, PaginationInfo } from '@/types';
+import type { Property, PropertyRow, PaginationInfo, PropertyCategory } from '@/types';
 
 // Optimize data fetching with revalidation
 export const revalidate = 60; // Cache for 60 seconds
@@ -19,6 +19,7 @@ interface SearchParams {
   minPrice?: string;
   maxPrice?: string;
   rooms?: string;
+  category?: PropertyCategory;
   page?: string;
 }
 
@@ -41,8 +42,11 @@ export default async function SatilikPage({
     .eq('type', 'satilik')
     .eq('status', 'aktif');
 
+  // Apply category filter
+  if (params.category) countQuery = countQuery.eq('category', params.category);
   if (params.location) countQuery = countQuery.ilike('location', `%${params.location}%`);
-  if (params.rooms) countQuery = countQuery.eq('rooms', Number(params.rooms));
+  // Only apply rooms filter if not filtering by 'arsa' category
+  if (params.rooms && params.category !== 'arsa') countQuery = countQuery.eq('rooms', Number(params.rooms));
   if (params.minPrice) {
     const minPrice = parseInt(params.minPrice);
     if (!isNaN(minPrice)) countQuery = countQuery.gte('price', minPrice);
@@ -61,8 +65,11 @@ export default async function SatilikPage({
     .eq('type', 'satilik')
     .eq('status', 'aktif');
 
+  // Apply category filter
+  if (params.category) query = query.eq('category', params.category);
   if (params.location) query = query.ilike('location', `%${params.location}%`);
-  if (params.rooms) query = query.eq('rooms', Number(params.rooms));
+  // Only apply rooms filter if not filtering by 'arsa' category
+  if (params.rooms && params.category !== 'arsa') query = query.eq('rooms', Number(params.rooms));
   if (params.minPrice) {
     const minPrice = parseInt(params.minPrice);
     if (!isNaN(minPrice)) query = query.gte('price', minPrice);

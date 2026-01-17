@@ -79,20 +79,35 @@ export function PropertyCard({ property, index }: PropertyCardProps) {
                   {property.title}
                 </h3>
 
-                {/* Specs Row */}
+                {/* Specs Row - Conditional based on category */}
                 <div className="flex items-center gap-4 text-white/50 text-xs">
-                  <span className="flex items-center gap-1">
-                    <Bed className="w-3.5 h-3.5" />
-                    {property.rooms}+{property.livingRoom}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Bath className="w-3.5 h-3.5" />
-                    {property.bathrooms}
-                  </span>
+                  {/* Area is always shown */}
                   <span className="flex items-center gap-1">
                     <Maximize className="w-3.5 h-3.5" />
                     {property.area} m²
                   </span>
+
+                  {/* Show rooms/bathrooms for Konut, or zoning for Arsa */}
+                  {(!property.category || property.category === 'konut') && property.rooms !== null && (
+                    <>
+                      <span className="flex items-center gap-1">
+                        <Bed className="w-3.5 h-3.5" />
+                        {property.rooms}+{property.livingRoom ?? 0}
+                      </span>
+                      {property.bathrooms !== null && (
+                        <span className="flex items-center gap-1">
+                          <Bath className="w-3.5 h-3.5" />
+                          {property.bathrooms}
+                        </span>
+                      )}
+                    </>
+                  )}
+
+                  {property.category === 'arsa' && property.zoning_status && (
+                    <span className="text-fbm-gold-400/70 truncate max-w-[120px]">
+                      {property.zoning_status}
+                    </span>
+                  )}
                 </div>
               </div>
 

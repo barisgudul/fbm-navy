@@ -6,6 +6,21 @@
 // Property status types
 export type PropertyStatus = 'aktif' | 'satildi' | 'kiralandi';
 export type PropertyType = 'satilik' | 'kiralik';
+export type PropertyCategory = 'konut' | 'arsa';
+
+// Zoning status options for Land (Arsa)
+export const ZONING_STATUS_OPTIONS = [
+  'Konut İmarlı',
+  'Ticari İmarlı',
+  'Sanayi İmarlı',
+  'Tarla (Tarım Arazisi)',
+  'Karma İmarlı',
+  'İmarsız',
+  'Orman Arazisi',
+  'Turizm İmarlı',
+] as const;
+
+export type ZoningStatus = typeof ZONING_STATUS_OPTIONS[number];
 
 // Database row type - matches Supabase schema exactly
 export interface PropertyRow {
@@ -14,15 +29,27 @@ export interface PropertyRow {
   location: string;
   price: string;
   area: number;
-  rooms: number;
-  living_rooms: number;
-  bathrooms: number;
+  category: PropertyCategory;
+  // Residential fields (nullable for Land)
+  rooms: number | null;
+  living_rooms: number | null;
+  bathrooms: number | null;
+  floor: number | null;
+  // Land-specific fields
+  zoning_status: string | null;
+  ada: string | null;
+  parsel: string | null;
+  kaks: number | null;
+  taks: number | null;
+  gabari: string | null;
+  tapu_durumu: string | null;
+  kredi_uygunluk: boolean | null;
+  // Common fields
   description: string | null;
   image_urls: string[];
   video_urls: string[] | null;
   type: PropertyType;
   status: PropertyStatus;
-  floor: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -34,11 +61,14 @@ export interface Property {
   location: string;
   price: string;
   area: number;
-  rooms: number;
-  livingRoom: number;
-  bathrooms: number;
+  category?: PropertyCategory;
+  rooms: number | null;
+  livingRoom: number | null;
+  bathrooms: number | null;
   image: string;
   status?: PropertyStatus;
+  // Land-specific fields for display
+  zoning_status?: string | null;
 }
 
 // Property detail type - extended with all fields for detail pages
@@ -48,6 +78,14 @@ export interface PropertyDetail extends Property {
   videos: string[];
   floor: number | null;
   type: PropertyType;
+  // Land-specific fields
+  ada?: string | null;
+  parsel?: string | null;
+  kaks?: number | null;
+  taks?: number | null;
+  gabari?: string | null;
+  tapu_durumu?: string | null;
+  kredi_uygunluk?: boolean | null;
 }
 
 // Database operation types
@@ -56,15 +94,27 @@ export interface PropertyInsert {
   location: string;
   price: string;
   area: number;
-  rooms: number;
-  living_rooms: number;
-  bathrooms: number;
+  category: PropertyCategory;
+  // Residential fields (optional for Land)
+  rooms?: number | null;
+  living_rooms?: number | null;
+  bathrooms?: number | null;
+  floor?: number | null;
+  // Land-specific fields
+  zoning_status?: string | null;
+  ada?: string | null;
+  parsel?: string | null;
+  kaks?: number | null;
+  taks?: number | null;
+  gabari?: string | null;
+  tapu_durumu?: string | null;
+  kredi_uygunluk?: boolean | null;
+  // Common fields
   description?: string | null;
   image_urls: string[];
   video_urls?: string[] | null;
   type: PropertyType;
   status?: PropertyStatus;
-  floor?: number | null;
 }
 
 export type PropertyUpdate = Partial<PropertyInsert>;
@@ -77,6 +127,7 @@ export function transformToProperty(row: PropertyRow): Property {
     location: row.location,
     price: row.price,
     area: row.area,
+    category: row.category || 'konut',
     rooms: row.rooms,
     livingRoom: row.living_rooms,
     bathrooms: row.bathrooms,
@@ -84,6 +135,7 @@ export function transformToProperty(row: PropertyRow): Property {
       ? row.image_urls[0]
       : 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop',
     status: row.status,
+    zoning_status: row.zoning_status,
   };
 }
 
@@ -96,6 +148,14 @@ export function transformToPropertyDetail(row: PropertyRow): PropertyDetail {
     videos: row.video_urls || [],
     floor: row.floor,
     type: row.type,
+    // Land-specific fields
+    ada: row.ada,
+    parsel: row.parsel,
+    kaks: row.kaks,
+    taks: row.taks,
+    gabari: row.gabari,
+    tapu_durumu: row.tapu_durumu,
+    kredi_uygunluk: row.kredi_uygunluk,
   };
 }
 
