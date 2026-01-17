@@ -103,7 +103,7 @@ function MekanTasarimlariContent() {
     <>
       {/* Cinematic Header */}
       <PageHeader
-        title="Mekan Tasarımları"
+        title="Projeler"
         subtitle="Mimari Vizyon"
         bgImage="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1920&q=80"
       />
@@ -125,9 +125,9 @@ function MekanTasarimlariContent() {
             </p>
           </motion.div>
 
-          {/* Filter Tabs */}
+      /* Filter Tabs */
           <FilterTabs
-            categories={DESIGN_FILTER_OPTIONS}
+            categories={DESIGN_FILTER_OPTIONS.filter(c => !['Otel Konsepti', 'Villa Projesi'].includes(c))}
             activeCategory={activeCategory}
             onSelect={handleCategorySelect}
           />
@@ -161,7 +161,7 @@ function LoadingFallback() {
   return (
     <>
       <PageHeader
-        title="Mekan Tasarımları"
+        title="Projeler"
         subtitle="Mimari Vizyon"
         bgImage="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1920&q=80"
       />

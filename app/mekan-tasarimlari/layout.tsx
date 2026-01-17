@@ -2,7 +2,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Mekan Tasarımları ve İç Mimarlık | FRH Gayrimenkul ve Tasarım Isparta & Burdur',
+  title: 'Projeler ve İç Mimarlık | FRH Gayrimenkul ve Tasarım Isparta & Burdur',
   description: 'Isparta ve Burdur\'da profesyonel mekan tasarımı ve iç mimarlık hizmetleri. Modern ve fonksiyonel tasarımlarla yaşam alanlarınızı dönüştürüyoruz. FRH Gayrimenkul ve Tasarım ile hayalinizdeki mekanı yaratın.',
   keywords: [
     'Isparta Mekan Tasarımı',
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     'Ev Dekorasyonu Burdur'
   ],
   openGraph: {
-    title: 'Mekan Tasarımları ve İç Mimarlık | FRH Gayrimenkul ve Tasarım',
+    title: 'Projeler ve İç Mimarlık | FRH Gayrimenkul ve Tasarım',
     description: 'Yaratıcı ve fonksiyonel mekan tasarımları. Isparta ve Burdur\'da profesyonel iç mimarlık hizmetleri.',
     url: 'https://www.fbmgayrimenkul.com/mekan-tasarimlari',
     type: 'website',
