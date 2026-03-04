@@ -1,41 +1,43 @@
 /* app/mekan-tasarimlari/layout.tsx */
 import type { Metadata } from 'next';
+import { seoConfig, getAbsoluteUrl } from '@/app/config/seo';
 
 export const metadata: Metadata = {
-  title: 'Projeler ve İç Mimarlık | FRH Gayrimenkul ve Tasarım Isparta & Burdur',
-  description: 'Isparta ve Burdur\'da profesyonel mekan tasarımı ve iç mimarlık hizmetleri. Modern ve fonksiyonel tasarımlarla yaşam alanlarınızı dönüştürüyoruz. FRH Gayrimenkul ve Tasarım ile hayalinizdeki mekanı yaratın.',
+  title: 'Isparta Mimarlık ve İç Mekan Tasarım Projeleri | Ferah Tabak Gayrimenkul',
+  description:
+    'Isparta merkezli mimarlık, iç mimarlık ve mekan tasarımı projeleri. Konut ve ticari alanlarda estetik, işlevsel ve yatırım değerini artıran tasarım çözümleri.',
   keywords: [
-    'Isparta Mekan Tasarımı',
-    'Burdur Mekan Tasarımı',
-    'Isparta İç Mimarlık',
-    'Burdur İç Mimarlık',
-    'Isparta Mimari Tasarım',
-    'FT Tasarım',
-    'Isparta Dekorasyon',
-    'Burdur Dekorasyon',
-    'Isparta Mimarlık Ofisi',
-    'İç Mekan Tasarımı Isparta',
-    'İç Mekan Tasarımı Burdur',
-    'Ofis Tasarımı Isparta',
-    'Ev Dekorasyonu Isparta',
-    'Ev Dekorasyonu Burdur'
+    'Isparta inşaat',
+    'Isparta mimar',
+    'Isparta iç mimar',
+    'Isparta mimarlık',
+    'Isparta iç mimarlık',
+    'Isparta mekan tasarımı',
+    'Isparta mimari tasarım',
+    'Isparta iç mekan dekorasyon',
+    'Isparta villa tasarımı',
+    'Isparta ofis tasarımı',
+    'Ferah Tabak tasarım',
   ],
   openGraph: {
-    title: 'Projeler ve İç Mimarlık | FRH Gayrimenkul ve Tasarım',
-    description: 'Yaratıcı ve fonksiyonel mekan tasarımları. Isparta ve Burdur\'da profesyonel iç mimarlık hizmetleri.',
-    url: 'https://www.fbmgayrimenkul.com/mekan-tasarimlari',
+    title: 'Isparta Mimarlık ve Tasarım Projeleri | Ferah Tabak Gayrimenkul',
+    description: 'Isparta için modern mimarlık ve iç mekan tasarımı portföyü.',
+    url: getAbsoluteUrl('/mekan-tasarimlari'),
     type: 'website',
     images: [
       {
-        url: '/logo.png',
+        url: seoConfig.ogImage,
         width: 1200,
         height: 630,
-        alt: 'FRH Gayrimenkul ve Tasarım Mekan Tasarımları',
+        alt: 'Isparta mimarlık ve mekan tasarımı projeleri',
       },
     ],
   },
   alternates: {
-    canonical: 'https://www.fbmgayrimenkul.com/mekan-tasarimlari',
+    canonical: getAbsoluteUrl('/mekan-tasarimlari'),
+    languages: {
+      'tr-TR': getAbsoluteUrl('/mekan-tasarimlari'),
+    },
   },
 };
 
@@ -46,4 +48,3 @@ export default function MekanTasarimlariLayout({
 }) {
   return <>{children}</>;
 }
-

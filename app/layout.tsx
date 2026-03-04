@@ -1,76 +1,41 @@
 /* app/layout.tsx */
 
-import type { Metadata } from "next";
-import { Inter, Bodoni_Moda } from "next/font/google";
-import "./globals.css";
-import { ClientWrapper } from "@/app/components/ClientWrapper";
-import Script from "next/script";
-import { GoogleAnalytics, GoogleTagManagerHead, GoogleTagManagerBody } from "@/app/components/GoogleAnalytics";
-import { seoConfig, getLocalBusinessSchema } from "@/app/config/seo";
+import type { Metadata } from 'next';
+import { Inter, Bodoni_Moda } from 'next/font/google';
+import './globals.css';
+import { ClientWrapper } from '@/app/components/ClientWrapper';
+import Script from 'next/script';
+import {
+  GoogleAnalytics,
+  GoogleTagManagerHead,
+  GoogleTagManagerBody,
+} from '@/app/components/GoogleAnalytics';
+import {
+  seoConfig,
+  getLocalBusinessSchema,
+  getOrganizationSchema,
+  getWebsiteSchema,
+  getServiceSchemas,
+} from '@/app/config/seo';
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const bodoni = Bodoni_Moda({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-bodoni", display: "swap" });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
+const bodoni = Bodoni_Moda({ subsets: ['latin'], weight: ['400', '700'], variable: '--font-bodoni', display: 'swap' });
 
 export const metadata: Metadata = {
   metadataBase: new URL(seoConfig.siteUrl),
+  applicationName: seoConfig.siteName,
   title: {
     default: seoConfig.defaultTitle,
-    template: "%s | FRH Gayrimenkul ve Tasarım Isparta"
+    template: `%s | ${seoConfig.brandName}`,
   },
   description: seoConfig.defaultDescription,
-  keywords: [
-    // Isparta Ana Anahtar Kelimeler
-    'Isparta Gayrimenkul',
-    'Isparta Emlak',
-    'Isparta Emlakçı',
-    'Isparta Satılık Daire',
-    'Isparta Satılık Ev',
-    'Isparta Satılık Villa',
-    'Isparta Satılık Arsa',
-    'Isparta Kiralık Ev',
-    'Isparta Kiralık Daire',
-    'Isparta Emlak İlanları',
-    'Isparta Konut',
-    'Isparta Ev Fiyatları',
-    'Isparta Daire Fiyatları',
-    'Isparta Merkez Emlak',
-    'Isparta Mimarlık',
-    'Isparta İç Mimarlık',
-    'Isparta Mekan Tasarım',
-    'Isparta Gayrimenkul Danışmanlığı',
-
-    // Burdur Ana Anahtar Kelimeler
-    'Burdur Gayrimenkul',
-    'Burdur Emlak',
-    'Burdur Emlakçı',
-    'Burdur Satılık Daire',
-    'Burdur Satılık Ev',
-    'Burdur Kiralık Ev',
-    'Burdur Ev Fiyatları',
-    'Burdur Mimarlık',
-
-    // Diğer Bölgeler
-    'Dinar Emlak',
-    'Dinar Satılık Ev',
-    'Keçiborlu Emlak',
-    'Keçiborlu Satılık Daire',
-    'Eğirdir Emlak',
-    'Eğirdir Satılık Ev',
-    'Yalvaç Emlak',
-    'Yalvaç Satılık Daire',
-    'Gönen Emlak',
-    'Şarkikaraağaç Emlak',
-    'Senirkent Emlak',
-    'Gelendost Emlak',
-
-    // Marka ve Ekip
-    'FRH Gayrimenkul ve Tasarım',
-    'FRH Gayrimenkul',
-    'Ferah Tabak',
-  ],
-  authors: [{ name: 'FRH Gayrimenkul ve Tasarım' }],
-  creator: 'FRH Gayrimenkul ve Tasarım',
-  publisher: 'FRH Gayrimenkul ve Tasarım',
+  keywords: seoConfig.mainKeywords,
+  category: 'real estate',
+  classification: 'Gayrimenkul, Mimarlık, Tasarım, Yatırım',
+  authors: [{ name: 'Ferah Tabak', url: seoConfig.siteUrl }],
+  creator: seoConfig.brandName,
+  publisher: seoConfig.brandName,
+  referrer: 'origin-when-cross-origin',
   robots: {
     index: true,
     follow: true,
@@ -84,6 +49,9 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: seoConfig.siteUrl,
+    languages: {
+      'tr-TR': seoConfig.siteUrl,
+    },
   },
   openGraph: {
     title: seoConfig.defaultTitle,
@@ -95,7 +63,7 @@ export const metadata: Metadata = {
         url: seoConfig.ogImage,
         width: 1200,
         height: 630,
-        alt: 'FRH Gayrimenkul ve Tasarım Isparta - Satılık ve Kiralık Ev İlanları',
+        alt: 'Isparta emlak, mimarlık, tasarım ve yatırım danışmanlığı',
       },
     ],
     locale: 'tr_TR',
@@ -116,10 +84,15 @@ export const metadata: Metadata = {
       { url: '/apple-icon.png', sizes: '192x192' },
       { url: '/apple-icon.png', sizes: '512x512' },
     ],
-    apple: [
-      { url: '/apple-icon.png', sizes: '180x180' },
-    ],
+    apple: [{ url: '/apple-icon.png', sizes: '180x180' }],
     shortcut: '/favicon.ico',
+  },
+  manifest: '/manifest.webmanifest',
+  other: {
+    'geo.region': 'TR-32',
+    'geo.placename': seoConfig.contact.address.city,
+    'geo.position': `${seoConfig.geo.latitude};${seoConfig.geo.longitude}`,
+    ICBM: `${seoConfig.geo.latitude}, ${seoConfig.geo.longitude}`,
   },
 };
 
@@ -128,58 +101,20 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Local Business JSON-LD Structured Data (from seo config)
   const localBusinessSchema = getLocalBusinessSchema();
-
-  const organizationSchema = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": seoConfig.siteName,
-    "url": seoConfig.siteUrl,
-    "logo": `${seoConfig.siteUrl}${seoConfig.logo}`,
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "telephone": seoConfig.contact.phone,
-      "contactType": "customer service",
-      "areaServed": "TR",
-      "availableLanguage": ["Turkish"]
-    },
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": seoConfig.contact.address.street,
-      "addressLocality": seoConfig.contact.address.city,
-      "addressRegion": seoConfig.contact.address.city,
-      "postalCode": seoConfig.contact.address.postalCode,
-      "addressCountry": seoConfig.contact.address.country
-    }
-  };
-
-  // Website Schema
-  const websiteSchema = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": seoConfig.siteName,
-    "url": seoConfig.siteUrl,
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": {
-        "@type": "EntryPoint",
-        "urlTemplate": `${seoConfig.siteUrl}/satilik?q={search_term_string}`
-      },
-      "query-input": "required name=search_term_string"
-    }
+  const organizationSchema = getOrganizationSchema();
+  const websiteSchema = getWebsiteSchema();
+  const servicesSchema = {
+    '@context': 'https://schema.org',
+    '@graph': getServiceSchemas(),
   };
 
   return (
-    <html lang="tr">
+    <html lang="tr-TR">
       <head>
-        {/* Google Tag Manager - HEAD'in en üstünde olmalı */}
         <GoogleTagManagerHead gtmId={seoConfig.analytics.googleTagManagerId} />
-
-        {/* Google Analytics */}
         <GoogleAnalytics gaId={seoConfig.analytics.googleAnalyticsId} />
 
-        {/* Structured Data Schemas */}
         <Script
           id="local-business-schema"
           type="application/ld+json"
@@ -204,14 +139,19 @@ export default function RootLayout({
             __html: JSON.stringify(websiteSchema),
           }}
         />
+        <Script
+          id="services-schema"
+          type="application/ld+json"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(servicesSchema),
+          }}
+        />
       </head>
       <body className={`${inter.variable} ${bodoni.variable} text-white bg-fixed`}>
-        {/* Google Tag Manager - BODY'nin hemen başında olmalı */}
         <GoogleTagManagerBody gtmId={seoConfig.analytics.googleTagManagerId} />
 
-        <ClientWrapper>
-          {children}
-        </ClientWrapper>
+        <ClientWrapper>{children}</ClientWrapper>
       </body>
     </html>
   );

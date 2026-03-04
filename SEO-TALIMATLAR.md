@@ -35,7 +35,7 @@
 ### 1. Google Search Console Kurulumu (ACİL!)
 
 **Adım 1:** [Google Search Console](https://search.google.com/search-console)'a gidin
-**Adım 2:** Sitenizi ekleyin: `https://www.fbmgayrimenkul.com`
+**Adım 2:** Sitenizi ekleyin: `https://ferahtabakgayrimenkul.com`
 **Adım 3:** Doğrulama kodunu alın
 **Adım 4:** Bu kodu `/app/config/seo.ts` dosyasındaki şu satıra yapıştırın:
 
@@ -44,7 +44,7 @@ googleSiteVerification: 'BURAYA_KODU_YAPIŞTIRIN',
 ```
 
 **Adım 5:** Sitemap'i Search Console'a gönderin: 
-- URL: `https://www.fbmgayrimenkul.com/sitemap.xml`
+- URL: `https://ferahtabakgayrimenkul.com/sitemap.xml`
 
 ### 2. Google Analytics Kurulumu (ÖNEMLİ!)
 
@@ -77,7 +77,7 @@ googleTagManagerId: 'GTM-BURAYA_ID_YAPIŞTIRIN',
 - Kategori: Emlak Danışmanlığı / Real Estate Agency
 - Adres: Fatih, 201. Cadde Yener İş Merkezi no:59/61, 32200 Merkez/Isparta
 - Telefon: +90 543 591 09 32
-- Web Sitesi: https://www.fbmgayrimenkul.com
+- Web Sitesi: https://ferahtabakgayrimenkul.com
 - Çalışma Saatleri: Pzt-Cmt: 09:00-19:00, Pazar Kapalı
 
 **Adım 3:** İşletmenizi doğrulayın (Posta veya telefon ile)
@@ -95,8 +95,8 @@ googleTagManagerId: 'GTM-BURAYA_ID_YAPIŞTIRIN',
 ### 5. Bing Webmaster Tools Kurulumu
 
 **Adım 1:** [Bing Webmaster Tools](https://www.bing.com/webmasters) hesabı oluşturun
-**Adım 2:** Sitenizi ekleyin: `https://www.fbmgayrimenkul.com`
-**Adım 3:** Sitemap gönderin: `https://www.fbmgayrimenkul.com/sitemap.xml`
+**Adım 2:** Sitenizi ekleyin: `https://ferahtabakgayrimenkul.com`
+**Adım 3:** Sitemap gönderin: `https://ferahtabakgayrimenkul.com/sitemap.xml`
 
 ### 6. Sosyal Medya Optimizasyonu
 

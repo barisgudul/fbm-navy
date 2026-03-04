@@ -2,6 +2,8 @@
 
 import type { NextConfig } from "next";
 
+const canonicalHost = 'ferahtabakgayrimenkul.com';
+
 const nextConfig: NextConfig = {
   // SEO ve Performance Optimizasyonları
   images: {
@@ -76,6 +78,24 @@ const nextConfig: NextConfig = {
   // Yönlendirmeler (eski domain'den yeni domain'e)
   async redirects() {
     return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.ferahtabakgayrimenkul.com' }],
+        destination: `https://${canonicalHost}/:path*`,
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.fbmgayrimenkul.com' }],
+        destination: `https://${canonicalHost}/:path*`,
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'fbmgayrimenkul.com' }],
+        destination: `https://${canonicalHost}/:path*`,
+        permanent: true,
+      },
       {
         source: '/home',
         destination: '/',

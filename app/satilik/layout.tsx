@@ -1,46 +1,42 @@
 /* app/satilik/layout.tsx */
 import type { Metadata } from 'next';
+import { seoConfig, getAbsoluteUrl } from '@/app/config/seo';
 
 export const metadata: Metadata = {
-  title: 'Satılık Daire ve Ev İlanları Isparta & Burdur | FRH Gayrimenkul ve Tasarım',
-  description: 'Isparta ve Burdur\'da satılık daire, ev, villa ve arsa ilanları. Merkez, Eğirdir, Yalvaç, Burdur, Dinar ve Keçiborlu\'da en uygun fiyatlı satılık konutları FRH Gayrimenkul ve Tasarım güvencesiyle bulun. Detaylı bilgi ve fiyatlar için hemen inceleyin.',
+  title: 'Isparta Satılık Daire, Ev, Villa ve Arsa İlanları | Ferah Tabak Gayrimenkul',
+  description:
+    'Isparta merkez ve ilçelerinde satılık daire, ev, villa ve arsa ilanları. Ferah Tabak Gayrimenkul ile oturum ve yatırım amaçlı satılık gayrimenkulleri güvenle karşılaştırın.',
   keywords: [
-    'Isparta Satılık Daire',
-    'Burdur Satılık Daire',
-    'Dinar Satılık Ev',
-    'Keçiborlu Satılık Daire',
-    'Isparta Satılık Ev',
-    'Isparta Satılık Villa',
-    'Burdur Satılık Ev',
-    'Isparta Satılık Arsa',
-    'Satılık Konut Isparta',
-    'Satılık Konut Burdur',
-    'Isparta Merkez Satılık Daire',
-    'Eğirdir Satılık Ev',
-    'Yalvaç Satılık Daire',
-    'Isparta Ev Fiyatları',
-    'Burdur Ev Fiyatları',
-    'Isparta Daire Fiyatları',
-    'Satılık Emlak Isparta',
-    'Satılık Emlak Burdur',
-    'FRH Gayrimenkul ve Tasarım Satılık'
+    'Isparta satılık daire',
+    'Isparta satılık ev',
+    'Isparta satılık villa',
+    'Isparta satılık arsa',
+    'Isparta emlak ilanları',
+    'Isparta yatırım fırsatları',
+    'Isparta gayrimenkul yatırımı',
+    'Isparta merkez satılık daire',
+    'Ferah Tabak gayrimenkul satılık',
   ],
   openGraph: {
-    title: 'Satılık Daire ve Ev İlanları Isparta & Burdur | FRH Gayrimenkul ve Tasarım',
-    description: 'Isparta ve Burdur\'da en uygun fiyatlı satılık daire, ev, villa ve arsa ilanları. Güvenilir emlak danışmanlığı.',
-    url: 'https://www.fbmgayrimenkul.com/satilik',
+    title: 'Isparta Satılık Emlak Portföyü | Ferah Tabak Gayrimenkul',
+    description:
+      'Isparta satılık daire, ev, villa ve arsa ilanları. Yatırım ve yaşam odaklı portföyler.',
+    url: getAbsoluteUrl('/satilik'),
     type: 'website',
     images: [
       {
-        url: '/logo.png',
+        url: seoConfig.ogImage,
         width: 1200,
         height: 630,
-        alt: 'Isparta Satılık Daire ve Ev İlanları',
+        alt: 'Isparta satılık emlak ilanları',
       },
     ],
   },
   alternates: {
-    canonical: 'https://www.fbmgayrimenkul.com/satilik',
+    canonical: getAbsoluteUrl('/satilik'),
+    languages: {
+      'tr-TR': getAbsoluteUrl('/satilik'),
+    },
   },
 };
 
@@ -51,4 +47,3 @@ export default function SatilikLayout({
 }) {
   return <>{children}</>;
 }
-

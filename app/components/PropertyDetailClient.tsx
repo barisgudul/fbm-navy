@@ -236,7 +236,7 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
                 />
               ) : (
                 <Image
-                  src={activeMedia?.url || '/logo.png'}
+                  src={activeMedia?.url || '/logo-transparent.png'}
                   alt={property.title}
                   fill
                   className="object-cover cursor-pointer"

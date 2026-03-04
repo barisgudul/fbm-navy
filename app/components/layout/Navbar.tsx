@@ -17,6 +17,7 @@ const navLinks = [
     { name: 'SATILIK', href: '/satilik' },
     { name: 'KİRALIK', href: '/kiralik' },
     { name: 'PROJELER', href: '/mekan-tasarimlari' },
+    { name: 'HİZMETLER', href: '/isparta-gayrimenkul-mimarlik-ve-yatirim' },
     { name: 'KURUMSAL', href: '/hakkimizda' },
     { name: 'İLETİŞİM', href: '/iletisim' },
 ];
@@ -50,7 +51,7 @@ export default function Navbar() {
                     <Link href="/" className="relative z-50 flex-shrink-0">
                         <div className={`relative transition-all duration-500 ${isScrolled ? 'w-20 md:w-24' : 'w-24 md:w-32'}`}>
                             <Image
-                                src="/logo.png"
+                                src="/logo-transparent.png"
                                 alt="FRH Logo"
                                 width={150}
                                 height={150}

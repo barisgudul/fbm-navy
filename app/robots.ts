@@ -1,5 +1,6 @@
 /* app/robots.ts */
-import { MetadataRoute } from 'next'
+import { MetadataRoute } from 'next';
+import { seoConfig } from '@/app/config/seo';
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -7,18 +8,12 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: [
-          '/admin/',
-          '/api/',
-          '/admin/*',
-          '/api/*',
-        ],
+        disallow: ['/admin/', '/api/', '/admin/*', '/api/*'],
       },
       {
         userAgent: 'Googlebot',
         allow: '/',
         disallow: ['/admin/', '/api/'],
-        crawlDelay: 0, // Google için hızlı tarama
       },
       {
         userAgent: 'Googlebot-Image',
@@ -26,8 +21,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/admin/'],
       },
     ],
-    sitemap: 'https://www.fbmgayrimenkul.com/sitemap.xml',
-    host: 'https://www.fbmgayrimenkul.com',
-  }
+    sitemap: `${seoConfig.siteUrl}/sitemap.xml`,
+    host: seoConfig.siteUrl,
+  };
 }
-

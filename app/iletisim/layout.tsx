@@ -1,35 +1,37 @@
 /* app/iletisim/layout.tsx */
 import type { Metadata } from 'next';
+import { seoConfig, getAbsoluteUrl } from '@/app/config/seo';
 
 export const metadata: Metadata = {
-  title: 'İletişim | FRH Gayrimenkul ve Tasarım Isparta & Burdur',
-  description: 'FRH Gayrimenkul ve Tasarım ile iletişime geçin. Adres: Fatih, 201. Cadde Yener İş Merkezi no:59/61, Isparta. Telefon: +90 543 591 09 32. Isparta ve Burdur bölgesinde gayrimenkul danışmanlığı için bize ulaşın.',
+  title: 'İletişim | Isparta Emlak, Mimarlık ve Yatırım Danışmanlığı',
+  description:
+    'Ferah Tabak Gayrimenkul ve Tasarım iletişim bilgileri. Isparta’da emlak, mimarlık, iç mekan tasarımı ve yatırım danışmanlığı için bizimle iletişime geçin.',
   keywords: [
-    'FRH Gayrimenkul ve Tasarım İletişim',
-    'Isparta Emlak İletişim',
-    'Burdur Emlak İletişim',
-    'FRH Gayrimenkul ve Tasarım Telefon',
-    'FRH Gayrimenkul ve Tasarım Adres',
-    'Isparta Emlakçı İletişim',
-    'Burdur Emlakçı İletişim',
-    'FT Emlak Telefon'
+    'Isparta emlak iletişim',
+    'Isparta mimarlık iletişim',
+    'Isparta yatırım danışmanlığı iletişim',
+    'Ferah Tabak telefon',
+    'Ferah Tabak ofis adresi',
   ],
   openGraph: {
-    title: 'İletişim | FRH Gayrimenkul ve Tasarım Isparta & Burdur',
-    description: 'Isparta ve Burdur\'da gayrimenkul ihtiyaçlarınız için FRH Gayrimenkul ve Tasarım ile iletişime geçin. Profesyonel danışmanlık hizmetleri.',
-    url: 'https://www.fbmgayrimenkul.com/iletisim',
+    title: 'İletişim | Ferah Tabak Gayrimenkul ve Tasarım',
+    description: 'Isparta merkez ofisimize ulaşın. Emlak, tasarım ve yatırım danışmanlığı desteği alın.',
+    url: getAbsoluteUrl('/iletisim'),
     type: 'website',
     images: [
       {
-        url: '/logo.png',
+        url: seoConfig.ogImage,
         width: 1200,
         height: 630,
-        alt: 'FRH Gayrimenkul ve Tasarım İletişim',
+        alt: 'Ferah Tabak Gayrimenkul ve Tasarım İletişim',
       },
     ],
   },
   alternates: {
-    canonical: 'https://www.fbmgayrimenkul.com/iletisim',
+    canonical: getAbsoluteUrl('/iletisim'),
+    languages: {
+      'tr-TR': getAbsoluteUrl('/iletisim'),
+    },
   },
 };
 
@@ -40,4 +42,3 @@ export default function IletisimLayout({
 }) {
   return <>{children}</>;
 }
-
