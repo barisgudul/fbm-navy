@@ -13,6 +13,7 @@ import {
   type DesignCategory,
   type DesignSpecs
 } from '@/app/lib/constants';
+import { prepareImageForUpload } from '@/app/lib/prepareImageForUpload';
 
 // Partial spec state for form
 // Unified Image Type
@@ -432,10 +433,8 @@ export default function EditDesignPage() {
         if (item.type === 'existing') {
           finalImages.push(item.url);
         } else {
-          // Upload new file
-          const file = item.file;
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}-design-edit.${fileExt}`;
+          const file = await prepareImageForUpload(item.file);
+          const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}-design-edit.jpg`;
 
           const { error: uploadError } = await supabase.storage
             .from('design-images')

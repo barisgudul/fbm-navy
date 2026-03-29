@@ -12,6 +12,7 @@ import {
 } from '@/app/lib/constants';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { prepareImageForUpload } from '@/app/lib/prepareImageForUpload';
 
 // Partial spec state for form (before category is added)
 type PartialSpecs = Omit<DesignSpecs, 'category'> | Record<string, unknown>;
@@ -121,9 +122,8 @@ export default function YeniProjePage() {
 
     try {
       for (let i = 0; i < selectedFiles.length; i++) {
-        const file = selectedFiles[i];
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}-${i}-design.${fileExt}`;
+        const file = await prepareImageForUpload(selectedFiles[i]);
+        const fileName = `${Date.now()}-${i}-design.jpg`;
         const filePath = fileName;
 
         const { error: uploadError } = await supabase.storage

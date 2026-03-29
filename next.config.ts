@@ -4,6 +4,18 @@ import type { NextConfig } from "next";
 
 const canonicalHost = 'ferahtabakgayrimenkul.com';
 
+function supabaseStorageHostname(): string {
+  const raw = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (raw) {
+    try {
+      return new URL(raw).hostname;
+    } catch {
+      /* fall through */
+    }
+  }
+  return 'istrefhfxookljsbsqzs.supabase.co';
+}
+
 const nextConfig: NextConfig = {
   // SEO ve Performance Optimizasyonları
   images: {
@@ -15,7 +27,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'istrefhfxookljsbsqzs.supabase.co',
+        hostname: supabaseStorageHostname(),
         pathname: '/**',
       },
     ],
