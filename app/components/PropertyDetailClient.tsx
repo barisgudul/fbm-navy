@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PropertyCard } from '@/app/components/PropertyCard';
 import { SocialShare } from '@/app/components/SocialShare';
 import { toast, Toaster } from 'sonner';
+import { isSupabaseStoragePublicUrl } from '@/app/lib/supabaseStorageImage';
 
 interface Property {
   id: number;
@@ -241,6 +242,7 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
                   fill
                   className="object-cover cursor-pointer"
                   priority
+                  unoptimized={isSupabaseStoragePublicUrl(activeMedia?.url ?? '')}
                   onClick={() => openLightbox(activeImageIndex)}
                 />
               )}
@@ -438,6 +440,7 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
                       fill
                       className="object-cover"
                       sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                      unoptimized={isSupabaseStoragePublicUrl(item.url)}
                     />
                   )}
                 </div>
@@ -485,6 +488,7 @@ export default function PropertyDetailClient({ initialProperty }: { initialPrope
                           sizes="100vw"
                           quality={90}
                           priority
+                          unoptimized={isSupabaseStoragePublicUrl(mediaItems[activeImageIndex].url)}
                         />
                       </div>
                     )}

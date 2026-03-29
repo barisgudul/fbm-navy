@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { Square, ArrowLeft, MapPin, Calendar, Play, Ruler, Droplets, Leaf, Home, Building2 } from 'lucide-react';
 import { SocialShare } from '@/app/components/SocialShare';
 import { SPEC_LABEL_MAP, formatSpecValue, type DesignSpecs } from '@/app/lib/constants';
+import { isSupabaseStoragePublicUrl } from '@/app/lib/supabaseStorageImage';
 
 interface Design {
   id: number;
@@ -131,6 +132,7 @@ export default function DesignDetailClient({ initialDesign }: { initialDesign: D
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 50vw"
+                  unoptimized={isSupabaseStoragePublicUrl(activeMedia.url)}
                 />
               )
             ) : (
@@ -268,6 +270,7 @@ export default function DesignDetailClient({ initialDesign }: { initialDesign: D
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
                       sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                      unoptimized={isSupabaseStoragePublicUrl(item.url)}
                     />
                   )}
                 </div>
